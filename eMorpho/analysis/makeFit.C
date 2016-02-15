@@ -6,9 +6,9 @@ void makeFit() {
 
   TString folder = "../data/";
   
-  //TString file = "Jan27_dark.root";
-  TString file = "Jan27_led_220ns_1.6v.root";
-  TString noiseFile = "Jan27_dark_noHV.root";
+  //TString file = "SampleData_dark.root";
+  TString file = "SampleData_led.root";
+  TString noiseFile = "SampleData_dark_noHV.root";
   
   double xlo = 15.0;
   double xhi = 215.0;
