@@ -1,6 +1,10 @@
 Tested with OSX Yosemite 10.10.5
 
 1) Install homebrew (http://brew.sh/)
+1a) Use it to install cmake:
+
+brew install cmake
+
 2) Download geant4 version 10.2.0 (http://geant4.web.cern.ch/geant4/support/download.shtml)
 3) Execute the following (the make command takes a long time):
 
