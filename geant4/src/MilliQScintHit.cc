@@ -38,7 +38,7 @@ G4ThreadLocal G4Allocator<MilliQScintHit>* MilliQScintHitAllocator=0;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-MilliQScintHit::MilliQScintHit() : fEdep(0.), fPos(0.), fPhysVol(0), fTime(0.), fCpNum(-1){}
+MilliQScintHit::MilliQScintHit() : fEdep(0.), fPos(0.), fTime(0.), fCpNum(-1), fPhysVol(0) {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

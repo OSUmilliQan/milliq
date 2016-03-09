@@ -4,7 +4,7 @@
 #include <math.h>
 #include <algorithm>
 
-MilliQAnalysis::MilliQAnalysis(std::vector< std::vector<G4double> > ppmtTime, std::vector< std::vector<G4double> > pscintTime,std::vector< std::vector<G4double> > pscintEn, G4int pNblock, G4int pNstack) : fNblock(pNblock), fNstack(pNstack),fIsActive(false) {
+MilliQAnalysis::MilliQAnalysis(std::vector< std::vector<G4double> > ppmtTime, std::vector< std::vector<G4double> > pscintTime,std::vector< std::vector<G4double> > pscintEn, G4int pNblock, G4int pNstack) : fNblock(pNblock), fNstack(pNstack), fIsActive(false), fVerbose(false) {
 
   fpmtTime = ppmtTime;
   fscintTime = pscintTime;
@@ -13,44 +13,60 @@ MilliQAnalysis::MilliQAnalysis(std::vector< std::vector<G4double> > ppmtTime, st
 
 }
 
-
 void MilliQAnalysis::NearestN() {
 
   //Figures out for which sequence all 3 pmt and Scint light up
-  G4cout<<"//////// "<<G4endl;
+  if(fVerbose) G4cout << "//////// " << G4endl;
+
   std::vector<G4int> activePMT;
   std::vector< std::vector<G4double> > activePMTTimes (fNstack);
+
   //The following identifies events in which 3 consecutive layers light up
 	
   bool recordEvent = true;
+
+  // For all stack layers
   for(G4int j = 0; j < fNstack; j++) {
 
+    // For all blocks in that stack
     bool layerHit = false;
     for(G4int i = 0; i < fNblock; i++) {
       if(fpmtTime[i + fNblock*j].size() > 0) {
 	layerHit = true;
+
+	// store PMT numbers with hits
 	activePMT.push_back(i + fNblock*j);
-	for(unsigned int k = 0; k < fpmtTime[i  +fNblock*j].size(); k++) activePMTTimes[j].push_back(fpmtTime[i + fNblock*j][k]);
+
+	// store the times of this cell's hits to the list of hit times in the stack layer
+	for(unsigned int k = 0; k < fpmtTime[i + fNblock*j].size(); k++) activePMTTimes[j].push_back(fpmtTime[i + fNblock*j][k]);
       }
     }
-    
+
+    // if any layer has no hits, don't 
     if(!layerHit) {
       recordEvent = false;
       //break;
     }
-    else G4cout << " Passed Layer " << j << G4endl;
+    else if(fVerbose) G4cout << " Passed Layer " << j << G4endl;
   }
   
-  G4cout << "record Event " << recordEvent << G4endl;  
-  if(recordEvent){
+  if(fVerbose) G4cout << "record Event " << recordEvent << G4endl;  
+
+  // If all three layers have hits (anywhere)
+  if(recordEvent) {
+
+    // loop through the last 2 stacks/layers
     for(G4int j = 1; j < fNstack; j++) {
+      
       for(G4int k = 0; k < j; k++) {
 
 	bool tFlag = false;
+
+	// if any two hits, in different layers, are within 15ns of each other, record the event
       	for(unsigned int a = 0; a < activePMTTimes[k].size(); a++) {
 	  for(unsigned int b = 0; b < activePMTTimes[j].size(); b++) {
-	    
-	    if(fabs(activePMTTimes[k][a]/ns-activePMTTimes[j][b]/ns) < 15/ns) {
+
+	    if(fabs(activePMTTimes[k][a]/ns - activePMTTimes[j][b]/ns) < 15/ns) {
 	      tFlag = true;
 	      break;
 	    }
@@ -71,7 +87,7 @@ void MilliQAnalysis::NearestN() {
   }
   
   if(recordEvent) {
-    G4cout << "Recorded Event" << G4endl;
+    if(fVerbose) G4cout << "Recorded Event" << G4endl;
     fIsActive = true;
     //		ComputeTandESummed();
     G4double ensum = 0;

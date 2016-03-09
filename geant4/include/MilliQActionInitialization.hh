@@ -33,26 +33,29 @@
 
 #include "G4VUserActionInitialization.hh"
 
-class MilliQRecorderBase;
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 
+class MilliQRecorderBase;
 class B4DetectorConstruction;
 
 /// Action initialization class.
 ///
 
-class MilliQActionInitialization : public G4VUserActionInitialization
-{
-  public:
-    MilliQActionInitialization(MilliQRecorderBase*recorder): G4VUserActionInitialization(), fRecorder(recorder){}
-    virtual ~MilliQActionInitialization(){};
+class MilliQActionInitialization : public G4VUserActionInitialization {
+  
+public:
+  MilliQActionInitialization(MilliQRecorderBase* recorder, const boost::property_tree::ptree pt): G4VUserActionInitialization(), fRecorder(recorder), fPTree(pt) {}
+  virtual ~MilliQActionInitialization() {};
 
-    virtual void BuildForMaster() const;
-    virtual void Build() const;
+  virtual void BuildForMaster() const;
+  virtual void Build() const;
 
-    virtual G4VSteppingVerbose* InitializeSteppingVerbose() const;
+  virtual G4VSteppingVerbose* InitializeSteppingVerbose() const;
 
-  private:
-    MilliQRecorderBase* fRecorder;
+private:
+  MilliQRecorderBase* fRecorder;
+  boost::property_tree::ptree fPTree;
 };
 
 #endif

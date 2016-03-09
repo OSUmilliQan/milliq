@@ -36,31 +36,34 @@
 
 #include "G4OpBoundaryProcess.hh"
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+
 class MilliQRecorderBase;
 class MilliQEventAction;
 class MilliQDetectorConstruction;
 class MilliQTrackingAction;
 class MilliQSteppingMessenger;
 
-class MilliQSteppingAction : public G4UserSteppingAction
-{
-  public:
+class MilliQSteppingAction : public G4UserSteppingAction {
 
-    MilliQSteppingAction(MilliQRecorderBase*);
-    virtual ~MilliQSteppingAction();
-    virtual void UserSteppingAction(const G4Step*);
+public:
 
-    void SetOneStepPrimaries(G4bool b){fOneStepPrimaries=b;}
-    G4bool GetOneStepPrimaries(){return fOneStepPrimaries;}
+  MilliQSteppingAction(MilliQRecorderBase*, const boost::property_tree::ptree pt);
+  virtual ~MilliQSteppingAction();
+  virtual void UserSteppingAction(const G4Step*);
+
+  void SetOneStepPrimaries(G4bool b) { fOneStepPrimaries = b; }
+  G4bool GetOneStepPrimaries() { return fOneStepPrimaries; }
  
-  private:
+private:
 
-    MilliQRecorderBase* fRecorder;
-    G4bool fOneStepPrimaries;
-    MilliQSteppingMessenger* fSteppingMessenger;
-    MilliQDetectorConstruction* milliqdetector;
+  MilliQRecorderBase* fRecorder;
+  G4bool fOneStepPrimaries;
+  MilliQSteppingMessenger* fSteppingMessenger;
+  MilliQDetectorConstruction* milliqdetector;
 
-    G4OpBoundaryProcessStatus fExpectedNextStatus;
+  G4OpBoundaryProcessStatus fExpectedNextStatus;
 };
 
 #endif

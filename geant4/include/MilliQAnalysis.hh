@@ -1,11 +1,12 @@
-
 #ifndef MilliQAnalysis_H
 #define MilliQAnalysis_H 1
 
+#include "MilliQDataFormat.hh"
+
 #include <vector>
 
-class MilliQAnalysis{
-public:
+class MilliQAnalysis {
+ public:
   MilliQAnalysis(std::vector< std::vector<G4double> > pmtTime,
 		 std::vector< std::vector<G4double> > scintTime,
 		 std::vector< std::vector<G4double> > scintEn,
@@ -14,14 +15,16 @@ public:
 
   void NearestN();
   void ComputeTandE();
-  bool IsActive(){return fIsActive;}
-  std::vector<G4double> GetPMTTimes(){return pmtTimes;}
-  std::vector<G4double> GetTimeOfFlight(){return timeOfFlight;}
-  std::vector<G4double> GetTotalEdep(){return totalEdep;}
-  std::vector<G4int> GetActiveEv(){return activeEvent;}
+  bool IsActive() { return fIsActive; }
+  
+  std::vector<G4double> GetPMTTimes() { return pmtTimes; }
+  std::vector<G4double> GetTimeOfFlight() { return timeOfFlight; }
+  std::vector<G4double> GetTotalEdep() { return totalEdep; }
+  std::vector<G4int> GetActiveEv() { return activeEvent; }
 
-
-private:
+  inline void SetVerbose(bool v) { fVerbose = v; }
+  
+ private:
 
   std::vector< std::vector<G4double> > fpmtTime;
   std::vector< std::vector<G4double> > fscintTime;
@@ -33,6 +36,8 @@ private:
   G4int fNblock;
   G4int fNstack;
   bool fIsActive;
+
+  bool fVerbose;
 };
 
 #endif

@@ -41,13 +41,11 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-MilliQTrackingAction::MilliQTrackingAction(MilliQRecorderBase* r)
-  : fRecorder(r) {}
+MilliQTrackingAction::MilliQTrackingAction(MilliQRecorderBase* r) : fRecorder(r) {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void MilliQTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
-{
+void MilliQTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
   //Let this be up to the user via vis.mac
   //  fpTrackingManager->SetStoreTrajectory(true);
 
@@ -65,8 +63,8 @@ void MilliQTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void MilliQTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
-  MilliQTrajectory* trajectory=(MilliQTrajectory*)fpTrackingManager->GimmeTrajectory();
+void MilliQTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
+  MilliQTrajectory* trajectory = (MilliQTrajectory*)fpTrackingManager->GimmeTrajectory();
 
   trajectory->SetDrawTrajectory(true);
 

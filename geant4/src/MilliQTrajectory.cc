@@ -46,26 +46,20 @@ G4ThreadLocal G4Allocator<MilliQTrajectory>* MilliQTrajectoryAllocator = 0;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-MilliQTrajectory::MilliQTrajectory()
-  :G4Trajectory(),fDrawit(false),fForceNoDraw(false),fForceDraw(false)
-{
-  fParticleDefinition=0;
+MilliQTrajectory::MilliQTrajectory() : G4Trajectory(), fDrawit(false), fForceNoDraw(false), fForceDraw(false) {
+  fParticleDefinition = 0;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-MilliQTrajectory::MilliQTrajectory(const G4Track* aTrack)
-  :G4Trajectory(aTrack),fDrawit(false)
-{
-  fParticleDefinition=aTrack->GetDefinition();
+MilliQTrajectory::MilliQTrajectory(const G4Track* aTrack) : G4Trajectory(aTrack),fDrawit(false) {
+  fParticleDefinition = aTrack->GetDefinition();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-MilliQTrajectory::MilliQTrajectory(MilliQTrajectory &right)
-  :G4Trajectory(right),fDrawit(right.fDrawit)
-{
-  fParticleDefinition=right.fParticleDefinition;
+MilliQTrajectory::MilliQTrajectory(MilliQTrajectory &right) : G4Trajectory(right), fDrawit(right.fDrawit) {
+  fParticleDefinition = right.fParticleDefinition;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

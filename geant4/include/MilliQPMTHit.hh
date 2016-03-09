@@ -91,7 +91,7 @@ class MilliQPMTHit : public G4VHit
     G4int fBlockID;
     G4double fEdep;
     G4double fTime;
- //   G4ThreeVector fPos;
+
     G4RotationMatrix fRot;
 
 };

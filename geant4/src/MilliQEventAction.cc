@@ -56,9 +56,9 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-MilliQEventAction::MilliQEventAction(MilliQRecorderBase* r)
-  : fRecorder(r),fSaveThreshold(0),fScintCollID(-1),fPMTCollID(-1), fPMTAllCollID(-1), fVerbose(0),
-   fPMTThreshold(1),fForcedrawphotons(false),fForcenophotons(false)
+MilliQEventAction::MilliQEventAction(MilliQRecorderBase* r, const boost::property_tree::ptree pt)
+  : fRecorder(r), fSaveThreshold(0), fPMTCollID(-1), fPMTAllCollID(-1), fScintCollID(-1), fVerbose(0),
+    fPMTThreshold(1), fForcedrawphotons(false), fForcenophotons(false), fPTree(pt)
 {
   fEventMessenger = new MilliQEventMessenger(this);
 }
@@ -72,16 +72,12 @@ MilliQEventAction::~MilliQEventAction(){}
 void MilliQEventAction::BeginOfEventAction(const G4Event* anEvent){
  
   //New event, add the user information object
-  G4EventManager::
-    GetEventManager()->SetUserInformation(new MilliQUserEventInformation);
+  G4EventManager::GetEventManager()->SetUserInformation(new MilliQUserEventInformation);
 
   G4SDManager* SDman = G4SDManager::GetSDMpointer();
-  if(fPMTCollID<0)
-    fPMTCollID=SDman->GetCollectionID("pmtHitCollection");
-  if(fPMTAllCollID<0)
-    fPMTAllCollID=SDman->GetCollectionID("pmtAllHitCollection");
-  if(fScintCollID<0)
-    fScintCollID=SDman->GetCollectionID("scintCollection");
+  if(fPMTCollID < 0) fPMTCollID = SDman->GetCollectionID("pmtHitCollection");
+  if(fPMTAllCollID < 0) fPMTAllCollID = SDman->GetCollectionID("pmtAllHitCollection");
+  if(fScintCollID < 0) fScintCollID = SDman->GetCollectionID("scintCollection");
 
   if(fRecorder)fRecorder->RecordBeginOfEvent(anEvent);
 }
@@ -101,7 +97,7 @@ void MilliQEventAction::EndOfEventAction(const G4Event* anEvent){
   if (trajectoryContainer) n_trajectories = trajectoryContainer->entries();
 
 
-// extract the trajectories and draw them
+  // extract the trajectories and draw them
   if (G4VVisManager::GetConcreteInstance()){
     for (G4int i=0; i<n_trajectories; i++){
       MilliQTrajectory* trj = (MilliQTrajectory*)
@@ -120,58 +116,58 @@ void MilliQEventAction::EndOfEventAction(const G4Event* anEvent){
   G4HCofThisEvent* hitsCE = anEvent->GetHCofThisEvent();
 
   if (!hitsCE)
-  {
+    {
       G4ExceptionDescription msg;
       msg << "No hits collection of this event found." << G4endl;
       G4Exception("MilliQEventAction::EndOfEventAction()",
                   "B5Code001", JustWarning, msg);
       return;
-  }
+    }
 
 
   //Get the hit collections
   if(hitsCE){
-	if(fScintCollID>=0)scintHC = (MilliQScintHitsCollection*)(hitsCE->GetHC(fScintCollID));
+    if(fScintCollID>=0)scintHC = (MilliQScintHitsCollection*)(hitsCE->GetHC(fScintCollID));
     if(fPMTCollID>=0)pmtHC = (MilliQPMTHitsCollection*)(hitsCE->GetHC(fPMTCollID));
     if(fPMTAllCollID>=0)pmtAllHC = (MilliQPMTHitsCollection*)(hitsCE->GetHC(fPMTAllCollID));
   }
 
 
   //Hits in scintillator
-   if(scintHC){
-     int n_hit = scintHC->entries();
-     G4ThreeVector  eWeightPos(0.);
-     G4double edep;
-     G4double edepMax=0;
+  if(scintHC){
+    int n_hit = scintHC->entries();
+    G4ThreeVector  eWeightPos(0.);
+    G4double edep;
+    G4double edepMax=0;
 
-     for(int i=0;i<n_hit;i++){ //gather info on hits in scintillator
-       edep=(*scintHC)[i]->GetEdep();
-       eventInformation->IncEDep(edep); //sum up the edep
-       eWeightPos += (*scintHC)[i]->GetPos()*edep;//calculate energy weighted pos
-       if(edep>edepMax){
-         edepMax=edep;//store max energy deposit
-         G4ThreeVector posMax=(*scintHC)[i]->GetPos();
-         eventInformation->SetPosMax(posMax,edep);
-       }
-     }
-     if(eventInformation->GetEDep()==0.){
-       if(fVerbose>0)G4cout<<"No hits in the scintillator this event."<<G4endl;
-     }
-     else{
-       //Finish calculation of energy weighted position
-       eWeightPos/=eventInformation->GetEDep();
-       eventInformation->SetEWeightPos(eWeightPos);
-       if(fVerbose>0){
-         G4cout << "\tEnergy weighted position of hits in MilliQ : "
-                << eWeightPos/mm << G4endl;
-       }
-     }
+    for(int i=0;i<n_hit;i++){ //gather info on hits in scintillator
+      edep=(*scintHC)[i]->GetEdep();
+      eventInformation->IncEDep(edep); //sum up the edep
+      eWeightPos += (*scintHC)[i]->GetPos()*edep;//calculate energy weighted pos
+      if(edep>edepMax){
+	edepMax=edep;//store max energy deposit
+	G4ThreeVector posMax=(*scintHC)[i]->GetPos();
+	eventInformation->SetPosMax(posMax,edep);
+      }
+    }
+    if(eventInformation->GetEDep()==0.){
+      if(fVerbose>0)G4cout<<"No hits in the scintillator this event."<<G4endl;
+    }
+    else{
+      //Finish calculation of energy weighted position
+      eWeightPos/=eventInformation->GetEDep();
+      eventInformation->SetEWeightPos(eWeightPos);
+      if(fVerbose>0){
+	G4cout << "\tEnergy weighted position of hits in MilliQ : "
+	       << eWeightPos/mm << G4endl;
+      }
+    }
 
-   }
+  }
 
 
   if(pmtHC){
-	  //It gets to this point :)
+    //It gets to this point :)
     G4ThreeVector reconPos(0.,0.,0.);
     G4int pmts=pmtHC->entries();
     //Gather info from all PMTs
@@ -198,84 +194,86 @@ void MilliQEventAction::EndOfEventAction(const G4Event* anEvent){
     pmtHC->DrawAllHits();
   }
 
-MilliQDetectorConstruction* milliqdetector = new MilliQDetectorConstruction;
-G4int NBlocks = milliqdetector->GetNblocksPerStack();
-G4int NStacks = milliqdetector->GetNstacks();
+  // durp -- no need to reconstruct the detector so many times
+  
+  MilliQDetectorConstruction* milliqdetector = new MilliQDetectorConstruction(fPTree);
+  G4int NBlocks = milliqdetector->GetNblocksPerStack();
+  G4int NStacks = milliqdetector->GetNstacks();
 
-std::vector< std::vector<G4double> >  pmtTime(NBlocks*NStacks);//we want the first scintillator hit, and the first pmt hit
-std::vector< std::vector<G4double> >  scintTime(NBlocks*NStacks);//we want the first scintillator hit, and the first pmt hit
-std::vector< std::vector<G4double> >  scintEnergy(NBlocks*NStacks);//we want the first scintillator hit, and the first pmt hit
-
-
-bool PrintStats = false;
-if(scintHC && pmtAllHC){
-
-	for(G4int j=0;j<pmtAllHC->entries();j++){
-		if( (*pmtAllHC)[j]->GetPMTNumber() > -1){ // It was hit!
-			PrintStats=true;
-			pmtTime[ (*pmtAllHC)[j]->GetPMTNumber() ].push_back((*pmtAllHC)[j]->GetTime() ) ;
-		}
-	}
-
-	for(int i=0;i<scintHC->entries();i++){
-		if( (*scintHC)[i]->GetCpNum()>-1){ // It was hit!
-			scintTime[ (*scintHC)[i]->GetCpNum() ].push_back((*scintHC)[i]->GetTime() ) ;
-			scintEnergy[ (*scintHC)[i]->GetCpNum() ].push_back((*scintHC)[i]->GetEdep() ) ;
-		}
-	}
-}
-for(unsigned int i = 0; i < pmtTime.size(); i++){
-	sort(pmtTime[i].begin(),pmtTime[i].end());
-}
-for(unsigned int i = 0; i < scintTime.size(); i++){
-	sort(scintTime[i].begin(),scintTime[i].end());
-}
-
-MilliQAnalysis* mcpan = new MilliQAnalysis(pmtTime,scintTime,scintEnergy,NBlocks,NStacks);
+  std::vector< std::vector<G4double> >  pmtTime(NBlocks*NStacks);//we want the first scintillator hit, and the first pmt hit
+  std::vector< std::vector<G4double> >  scintTime(NBlocks*NStacks);//we want the first scintillator hit, and the first pmt hit
+  std::vector< std::vector<G4double> >  scintEnergy(NBlocks*NStacks);//we want the first scintillator hit, and the first pmt hit
 
 
-if(mcpan->IsActive()==true){
+  bool PrintStats = false;
+  if(scintHC && pmtAllHC){
 
-	G4int pmt;
+    for(G4int j=0;j<pmtAllHC->entries();j++){
+      if( (*pmtAllHC)[j]->GetPMTNumber() > -1){ // It was hit!
+	PrintStats=true;
+	pmtTime[ (*pmtAllHC)[j]->GetPMTNumber() ].push_back((*pmtAllHC)[j]->GetTime() ) ;
+      }
+    }
 
-	for(G4int i = 0; i < NStacks; i++){
+    for(int i=0;i<scintHC->entries();i++){
+      if( (*scintHC)[i]->GetCpNum()>-1){ // It was hit!
+	scintTime[ (*scintHC)[i]->GetCpNum() ].push_back((*scintHC)[i]->GetTime() ) ;
+	scintEnergy[ (*scintHC)[i]->GetCpNum() ].push_back((*scintHC)[i]->GetEdep() ) ;
+      }
+    }
+  }
+  for(unsigned int i = 0; i < pmtTime.size(); i++){
+    sort(pmtTime[i].begin(),pmtTime[i].end());
+  }
+  for(unsigned int i = 0; i < scintTime.size(); i++){
+    sort(scintTime[i].begin(),scintTime[i].end());
+  }
 
-		pmt = mcpan->GetActiveEv()[i];
-		analysisManager->FillNtupleIColumn( 2,i, pmt );
-		analysisManager->FillNtupleDColumn( 2,i+NStacks, mcpan->GetPMTTimes()[i]/ns );
-		analysisManager->FillNtupleDColumn( 2,i+2*NStacks, mcpan->GetTimeOfFlight()[i]/ns );
-		analysisManager->FillNtupleDColumn( 2,i+3*NStacks, mcpan->GetTotalEdep()[i]/MeV );
+  MilliQAnalysis* mcpan = new MilliQAnalysis(pmtTime, scintTime, scintEnergy, NBlocks, NStacks);
 
-		for(unsigned int j = 0; j < pmtTime[pmt].size(); j++){
-			analysisManager->FillNtupleDColumn( 5+i,0,pmtTime[pmt][j]);
-			analysisManager->AddNtupleRow(5+i);
-		}
-		analysisManager->FillNtupleDColumn( 5+i,0,-1.);
-		analysisManager->AddNtupleRow(5+i);
+  if(mcpan->IsActive()) {
 
-		G4double stdev;
-		G4double counter=0.;
-		G4double mean = std::accumulate(scintTime[pmt].begin(),scintTime[pmt].end(),0.0);
+    G4int pmt;
 
-		for(unsigned int j = 0; j < scintEnergy[pmt].size(); j++){
-			stdev += pow(scintTime[pmt][j] - mean,2);
-			counter+=1;
-		}
+    for(G4int i = 0; i < NStacks; i++){
 
-		analysisManager->FillNtupleDColumn( 1,0, mean );
-		analysisManager->FillNtupleDColumn(1,1, counter);
+      pmt = mcpan->GetActiveEv()[i];
+      
+      analysisManager->FillNtupleIColumn(MilliQDataFormat::kAll, i, pmt);
+      analysisManager->FillNtupleDColumn(MilliQDataFormat::kAll, i + NStacks, mcpan->GetPMTTimes()[i]/ns);
+      analysisManager->FillNtupleDColumn(MilliQDataFormat::kAll, i + 2*NStacks, mcpan->GetTimeOfFlight()[i]/ns);
+      analysisManager->FillNtupleDColumn(MilliQDataFormat::kAll, i + 3*NStacks, mcpan->GetTotalEdep()[i]/MeV);
 
-//		analysisManager->FillNtupleDColumn( 1,0, scintEnergy[pmt][j]/eV);
-//		analysisManager->FillNtupleDColumn( 1,1, scintTime[pmt][j]/ns );
-		analysisManager->AddNtupleRow(1);
+      for(unsigned int j = 0; j < pmtTime[pmt].size(); j++){
+	analysisManager->FillNtupleDColumn(MilliQDataFormat::kPMT0Times + i, 0, pmtTime[pmt][j]);
+	analysisManager->AddNtupleRow(MilliQDataFormat::kPMT0Times + i);
+      }
+      analysisManager->FillNtupleDColumn(MilliQDataFormat::kPMT0Times + i, 0, -1.);
+      analysisManager->AddNtupleRow(MilliQDataFormat::kPMT0Times + i);
+
+      G4double stdev = 0.;
+      G4double counter = 0.;
+      G4double mean = std::accumulate(scintTime[pmt].begin(),scintTime[pmt].end(),0.0);
+
+      for(unsigned int j = 0; j < scintEnergy[pmt].size(); j++){
+	stdev += pow(scintTime[pmt][j] - mean,2);
+	counter+=1;
+      }
+
+      analysisManager->FillNtupleDColumn(MilliQDataFormat::kScintHits, 0, mean);
+      analysisManager->FillNtupleDColumn(MilliQDataFormat::kScintHits, 1, counter);
+
+      //		analysisManager->FillNtupleDColumn(MilliQDataFormat::kScintHits, 0, scintEnergy[pmt][j]/eV);
+      //		analysisManager->FillNtupleDColumn(MilliQDataFormat::kScintHits, 1, scintTime[pmt][j]/ns );
+      analysisManager->AddNtupleRow(MilliQDataFormat::kScintHits);
 
 
-	}
+    }
 
-	analysisManager->FillNtupleIColumn( 2, 12, eventInformation->GetPhotonCount_Scint() );
-	analysisManager->AddNtupleRow(2);
+    analysisManager->FillNtupleIColumn(MilliQDataFormat::kAll, 12, eventInformation->GetPhotonCount_Scint() );
+    analysisManager->AddNtupleRow(MilliQDataFormat::kAll);
 
-}
+  }
 
 
 
@@ -310,17 +308,17 @@ if(mcpan->IsActive()==true){
     G4RunManager::GetRunManager()->rndmSaveThisEvent();
 
   if(fRecorder)fRecorder->RecordEndOfEvent(anEvent);
-  analysisManager->AddNtupleRow(1);
+  analysisManager->AddNtupleRow(MilliQDataFormat::kScintHits);
 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void MilliQEventAction::SetSaveThreshold(G4int save){
-/*Sets the save threshold for the random number seed. If the number of photons
-generated in an event is lower than this, then save the seed for this event
-in a file called run###evt###.rndm
-*/
+  /*Sets the save threshold for the random number seed. If the number of photons
+    generated in an event is lower than this, then save the seed for this event
+    in a file called run###evt###.rndm
+  */
   fSaveThreshold=save;
   G4RunManager::GetRunManager()->SetRandomNumberStore(true);
   G4RunManager::GetRunManager()->SetRandomNumberStoreDir("random/");

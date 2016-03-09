@@ -32,27 +32,32 @@
 #include "G4VSensitiveDetector.hh"
 #include "MilliQScintHit.hh"
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+
 class G4Step;
 class G4HCofThisEvent;
 
 class MilliQScintSD : public G4VSensitiveDetector
 {
-  public:
+public:
 
-    MilliQScintSD(G4String name);
-    virtual ~MilliQScintSD();
+  MilliQScintSD(G4String name, const boost::property_tree::ptree pt);
+  virtual ~MilliQScintSD();
 
-    virtual void Initialize(G4HCofThisEvent* );
-    virtual G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* );
-    virtual void EndOfEvent(G4HCofThisEvent* );
-    virtual void clear();
-    virtual void DrawAll();
-    virtual void PrintAll();
+  virtual void Initialize(G4HCofThisEvent* );
+  virtual G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* );
+  virtual void EndOfEvent(G4HCofThisEvent* );
+  virtual void clear();
+  virtual void DrawAll();
+  virtual void PrintAll();
  
-  private:
+private:
 
-    MilliQScintHitsCollection* fScintCollection;
-    G4int NBlocks;
+  MilliQScintHitsCollection* fScintCollection;
+  G4int NBlocks;
+
+  boost::property_tree::ptree fPTree;
  
 };
 

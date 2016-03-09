@@ -1,4 +1,3 @@
-
 #ifndef MilliQDetectorConstruction_H
 #define MilliQDetectorConstruction_H 1
 
@@ -22,108 +21,108 @@ class G4GlobalMagFieldMessenger;
 #include "MilliQScintSD.hh"
 #include "MilliQDetectorStackParameterisation.hh"
 
-
-
 #include "G4VUserDetectorConstruction.hh"
 #include "G4Cache.hh"
 #include "globals.hh"
 
-class MilliQDetectorConstruction : public G4VUserDetectorConstruction
-{
-  public:
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 
-    MilliQDetectorConstruction();
-    virtual ~MilliQDetectorConstruction(){};
+class MilliQDetectorConstruction : public G4VUserDetectorConstruction {
 
-    virtual G4VPhysicalVolume* Construct();
+public:
 
-    virtual void ConstructSDandField();
-    void ConstructShield(G4LogicalVolume*, G4double, G4double);
+  MilliQDetectorConstruction(const boost::property_tree::ptree pt);
+  virtual ~MilliQDetectorConstruction() {};
 
-    void ConstructCheckGeometry();
+  virtual G4VPhysicalVolume* Construct();
 
+  virtual void ConstructSDandField();
+  void ConstructShield(G4LogicalVolume*, G4double, G4double);
 
-    //Functions to modify the geometry
-    void SetMagField(G4double);
-    void SetHousingThickness(G4double );
-    void SetPMTRadius(G4double );
-    void SetDefaults();
+  void ConstructCheckGeometry();
 
-    //Get values
-    G4double GetHousingThickness(){return fD_mtl;}
-    G4double GetPMTRadius(){return fOuterRadius_pmt;}
-    G4int GetNblocksPerStack(){return NBlocks.x()*NBlocks.y()*NBlocks.z();}
-    G4int GetNstacks(){return NStacks ;}
-    G4int GetAlternateGeometry(){return fAlternate;}
-    inline const G4Material* GetScintMaterial() {return fScintillatorMaterial;};
+  //Functions to modify the geometry
+  void SetMagField(G4double);
+  void SetHousingThickness(G4double );
+  void SetPMTRadius(G4double );
+  void SetDefaults();
 
-    void SetHousingReflectivity(G4double );
-    G4double GetHousingReflectivity(){return fRefl;}
+  //Get values
+  G4double GetHousingThickness(){return fD_mtl;}
+  G4double GetPMTRadius(){return fOuterRadius_pmt;}
+  G4int GetNblocksPerStack(){return NBlocks.x()*NBlocks.y()*NBlocks.z();}
+  G4int GetNstacks(){return NStacks ;}
+  G4int GetAlternateGeometry(){return fAlternate;}
+  inline const G4Material* GetScintMaterial() {return fScintillatorMaterial;};
 
-    void SetMainScintYield(G4double );
-    void DefineMaterials();
-    void DefineMaterialsStewart();
+  void SetHousingReflectivity(G4double );
+  G4double GetHousingReflectivity(){return fRefl;}
 
+  void SetMainScintYield(G4double );
+  void DefineMaterials();
+  void DefineMaterialsStewart();
 
-  private:
+private:
 
+  G4VPhysicalVolume* ConstructDetector();
 
-    G4VPhysicalVolume* ConstructDetector();
+  MilliQDetectorMessenger* fDetectorMessenger;
 
-    MilliQDetectorMessenger* fDetectorMessenger;
+  G4VPhysicalVolume* fWorldPV;
+  G4VPhysicalVolume* fWorldPVCheckPhysics;
+  G4LogicalVolume* worldLV;
+  G4LogicalVolume* fMagneticVolume;
 
+  // Configuration
+  const boost::property_tree::ptree fPTree;
 
-    G4VPhysicalVolume* fWorldPV;
-    G4VPhysicalVolume* fWorldPVCheckPhysics;
-    G4LogicalVolume* worldLV;
-    G4LogicalVolume* fMagneticVolume;
+  //Materials & Elements
+  G4Material* fScintillatorMaterial;
+  G4Material* fAluminiumMaterial;
+  G4Material* fAirMaterial;
+  G4Material* fGlassMaterial;
+  G4Material* fVacuumMaterial;
+  G4Material* fConcreteMaterial;
+  G4Material* led;
+  G4Material* polyethylene;
 
-    //Materials & Elements
-    G4Material* fScintillatorMaterial;
-    G4Material* fAluminiumMaterial;
-    G4Material* fAirMaterial;
-    G4Material* fGlassMaterial;
-    G4Material* fVacuumMaterial;
-    G4Material* fConcreteMaterial;
-    G4Material* led;
-    G4Material* polyethylene;
+  //Geometry
+  G4double fScint_x;
+  G4double fScint_y;
+  G4double fScint_z;
+  G4double fD_mtl;
+  G4double fScintHouseThick;
+  G4double fLightGuideLength;
+  G4double fScintillatorHouseRefl;
+  G4double fPmtRad;
+  G4double fPmtPhotoRad;
+  G4double fPmtPhotoHeight;
+  G4double fPmtPhotoDepth;
+  G4double fLGHouseRefl;
+  G4double fOuterRadius_pmt;
+  G4double fRefl;
+  G4double NStacks;
+  G4ThreeVector fOffset;
+  G4ThreeVector shield1Thick;
+  G4ThreeVector shield2Thick;
+  G4ThreeVector detShieldGap;
+  G4ThreeVector NBlocks;
+  G4ThreeVector fBetweenBlockSpacing;
+  G4int fAlternate;
+  static G4ThreadLocal G4GlobalMagFieldMessenger*  fMagFieldMessenger;
 
-    //Geometry
-    G4double fScint_x;
-    G4double fScint_y;
-    G4double fScint_z;
-    G4double fD_mtl;
-    G4double fScintHouseThick;
-    G4double fLightGuideLength;
-    G4double fScintillatorHouseRefl;
-    G4double fPmtRad;
-    G4double fPmtPhotoRad;
-    G4double fPmtPhotoHeight;
-    G4double fPmtPhotoDepth;
-    G4double fLGHouseRefl;
-    G4double fOuterRadius_pmt;
-    G4double fRefl;
-    G4double NStacks;
-    G4ThreeVector fOffset;
-    G4ThreeVector shield1Thick;
-    G4ThreeVector shield2Thick;
-    G4ThreeVector detShieldGap;
-    G4ThreeVector NBlocks;
-    G4ThreeVector fBetweenBlockSpacing;
-    G4int fAlternate;
-    static G4ThreadLocal G4GlobalMagFieldMessenger*  fMagFieldMessenger;
+  G4UniformMagField* fMagField;
+  MilliQDetectorStack* fDetectorStack;
+  MilliQMonopoleFieldSetup* fMonFieldSetup;
 
-    G4UniformMagField*    fMagField;
-    MilliQDetectorStack* fDetectorStack;
-    MilliQMonopoleFieldSetup* fMonFieldSetup;
+  G4Cache<MilliQMonopoleFieldSetup*> fEmFieldSetup;
 
-    G4Cache<MilliQMonopoleFieldSetup*>    fEmFieldSetup;
+  G4MaterialPropertiesTable* fScintillator_mt;
 
-    G4MaterialPropertiesTable* fScintillator_mt;
-
-    //Sensitive Detectors
-    G4Cache<MilliQPMTSD*> fPmt_SD;
-    G4Cache<MilliQScintSD*> fScint_SD;
+  //Sensitive Detectors
+  G4Cache<MilliQPMTSD*> fPmt_SD;
+  G4Cache<MilliQScintSD*> fScint_SD;
 
 };
 

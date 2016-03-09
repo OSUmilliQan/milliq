@@ -65,134 +65,126 @@ std::vector<std::vector<G4double> >	MilliQPrimaryGeneratorAction::vertexList;
 std::vector<std::vector<G4double> >	MilliQPrimaryGeneratorAction::momentumList;
 std::vector<std::vector<G4double> >	MilliQPrimaryGeneratorAction::qmeList;
 
-
 MilliQPrimaryGeneratorAction::MilliQPrimaryGeneratorAction() :
-		G4VUserPrimaryGeneratorAction(), fParticleGun(0), fGunMessenger(0), fRndmFlag(
-				"off"), fXVertex(0.), fYVertex(0.), fZVertex(0.), fEnergy(0.), fCalibDefined(
-				false), fVertexDefined(false) {
-	MilliQMonopolePhysics* MonopoleProperties = new MilliQMonopolePhysics();
+  G4VUserPrimaryGeneratorAction(), fParticleGun(0), fGunMessenger(0), fRndmFlag("off"),
+  fXVertex(0.), fYVertex(0.), fZVertex(0.), fEnergy(0.), fVertexDefined(false), fCalibDefined(false) {
 
-	G4int n_particle = 1;
-	fParticleGun = new G4ParticleGun(n_particle);
+  MilliQMonopolePhysics* MonopoleProperties = new MilliQMonopolePhysics();
 
-	// create a messenger for this class
-	fGunMessenger = new MilliQPrimaryGeneratorMessenger(this);
+  G4int n_particle = 1;
+  fParticleGun = new G4ParticleGun(n_particle);
 
-	// default particle kinematic
+  // create a messenger for this class
+  fGunMessenger = new MilliQPrimaryGeneratorMessenger(this);
 
-	G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-	std::string particleName;
+  // default particle kinematic
 
-	  G4ParticleDefinition* particle
-	    = particleTable->FindParticle(particleName="monopole");
+  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  std::string particleName;
+
+  G4ParticleDefinition* particle = particleTable->FindParticle(particleName = "monopole");
 
   fParticleGun->SetParticleDefinition(particle);
-	  fgPrimaryParticle = particle;
+  fgPrimaryParticle = particle;
 
-	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., 0., 0.));
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., 0., 0.));
 
-	fXVertex = -990. * cm;
-	fYVertex = 0.;
-	fZVertex = 0.;
-	fEnergy = 10. * GeV;
-	fParticleGun->SetParticlePosition(
-			G4ThreeVector(fXVertex, fYVertex, fZVertex));
-	fParticleGun->SetParticleEnergy(fEnergy);
+  fXVertex = -990. * cm;
+  fYVertex = 0.;
+  fZVertex = 0.;
+  fEnergy = 10. * GeV;
+  fParticleGun->SetParticlePosition(G4ThreeVector(fXVertex, fYVertex, fZVertex));
+  fParticleGun->SetParticleEnergy(fEnergy);
 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 MilliQPrimaryGeneratorAction::~MilliQPrimaryGeneratorAction() {
-	delete fParticleGun;
-	delete fGunMessenger;
+  delete fParticleGun;
+  delete fGunMessenger;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void MilliQPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
 
+  //Load in the data
+  if(firstPass == true){
+    GetLHEFourVectors();
+    firstPass = false;
+  }
 
-	//Load in the data
-	if(firstPass == true){
-		GetLHEFourVectors();
-		firstPass = false;
-	}
+  G4double x0, y0, z0, xMo, yMo, zMo, En, MoNorm;
+  if (fVertexDefined) {
+    x0 = fXVertex;
+    y0 = fYVertex;
+    z0 = fZVertex;
+    En = fEnergy;
+    xMo = 1.;
+    yMo = -0.1 + 0.2 * G4UniformRand();
+    zMo = 0.;
+  }
+  else {
+    xMo = momentumList[neventLHE][0];
+    yMo = momentumList[neventLHE][1];
+    zMo = momentumList[neventLHE][2];
+    x0 = 0.00*m;//vertexList[neventLHE][0]*m;
+    y0 = vertexList[neventLHE][1]*m;
+    z0 = vertexList[neventLHE][2]*m;
+    En = qmeList[neventLHE][2]*GeV;
+  }
 
-	G4double x0, y0, z0, xMo, yMo, zMo, En, MoNorm;
-	if (fVertexDefined) {
-		x0 = fXVertex;
-		y0 = fYVertex;
-		z0 = fZVertex;
-		En = fEnergy;
-		xMo = 1.;
-		yMo = -0.1 + 0.2 * G4UniformRand();
-		zMo = 0.;
-	} else {
-		xMo = momentumList[neventLHE][0];
-		yMo = momentumList[neventLHE][1];
-		zMo = momentumList[neventLHE][2];
-		x0 = 0.00*m;//vertexList[neventLHE][0]*m;
-		y0 = vertexList[neventLHE][1]*m;
-		z0 = vertexList[neventLHE][2]*m;
-		En = qmeList[neventLHE][2]*GeV;
-	}
+  MoNorm = sqrt(pow(xMo, 2) + pow(yMo, 2) + pow(zMo, 2));
 
-	MoNorm = sqrt(pow(xMo, 2) + pow(yMo, 2) + pow(zMo, 2));
+  if(neventLHE % 100 == 0) G4cout <<"neventLHE "<<neventLHE<<G4endl;
 
-	if(neventLHE % 100 == 0)
-		G4cout <<"neventLHE "<<neventLHE<<G4endl;
+  //	G4cout << "xMoGun " << xMo << " yMoGun " << yMo << " zMoGun " << zMo << " xGun " << x0 << " yGun " << y0 << " zGun " << z0 << G4endl;
+  //	G4cout << "nevent " << neventLHE << " Q " << qmeList[neventLHE][0] << " M " << qmeList[neventLHE][1] << " E "<< qmeList[neventLHE][2] << G4endl;
 
-//	G4cout << "xMoGun " << xMo << " yMoGun " << yMo << " zMoGun " << zMo << " xGun " << x0 << " yGun " << y0 << " zGun " << z0 << G4endl;
-//	G4cout << "nevent " << neventLHE << " Q " << qmeList[neventLHE][0] << " M " << qmeList[neventLHE][1] << " E "<< qmeList[neventLHE][2] << G4endl;
-
-	fParticleGun->SetParticleMomentumDirection(	G4ThreeVector(xMo / MoNorm, yMo / MoNorm, zMo / MoNorm));
-	fParticleGun->SetParticleEnergy(En);
-	fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
-	fParticleGun->GeneratePrimaryVertex(anEvent);
-	fParticleGun->SetParticleDefinition(fgPrimaryParticle);
-	neventLHE++;
+  fParticleGun->SetParticleMomentumDirection(	G4ThreeVector(xMo / MoNorm, yMo / MoNorm, zMo / MoNorm));
+  fParticleGun->SetParticleEnergy(En);
+  fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
+  fParticleGun->GeneratePrimaryVertex(anEvent);
+  fParticleGun->SetParticleDefinition(fgPrimaryParticle);
+  neventLHE++;
 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4String MilliQPrimaryGeneratorAction::GetPrimaryName() {
-	return fgPrimaryParticle->GetParticleName();
+  return fgPrimaryParticle->GetParticleName();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void MilliQPrimaryGeneratorAction::SetXVertex(G4double x) {
-	fVertexDefined = true;
-	fXVertex = x;
-	G4cout << " X coordinate of the primary vertex = " << fXVertex / mm
-			<< " mm." << G4endl;
+  fVertexDefined = true;
+  fXVertex = x;
+  G4cout << " X coordinate of the primary vertex = " << fXVertex / mm << " mm." << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void MilliQPrimaryGeneratorAction::SetYVertex(G4double y) {
-	fVertexDefined = true;
-	fYVertex = y;
-	G4cout << " Y coordinate of the primary vertex = " << fYVertex / mm
-			<< " mm." << G4endl;
+  fVertexDefined = true;
+  fYVertex = y;
+  G4cout << " Y coordinate of the primary vertex = " << fYVertex / mm << " mm." << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void MilliQPrimaryGeneratorAction::SetZVertex(G4double z) {
-	fVertexDefined = true;
-	fZVertex = z;
-	G4cout << " Z coordinate of the primary vertex = " << fZVertex / mm
-			<< " mm." << G4endl;
+  fVertexDefined = true;
+  fZVertex = z;
+  G4cout << " Z coordinate of the primary vertex = " << fZVertex / mm << " mm." << G4endl;
 }
 
 void MilliQPrimaryGeneratorAction::SetCalibEnergy(G4double e) {
-	fCalibDefined = true;
-	fEnergy = e;
-	G4cout << " Energy of the primary vertex = " << fEnergy / GeV << " GeV."
-			<< G4endl;
+  fCalibDefined = true;
+  fEnergy = e;
+  G4cout << " Energy of the primary vertex = " << fEnergy / GeV << " GeV." << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -200,37 +192,37 @@ void MilliQPrimaryGeneratorAction::SetCalibEnergy(G4double e) {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void MilliQPrimaryGeneratorAction::GetLHEFourVectors() {
-    std::ifstream infile;
+  std::ifstream infile;
 
-    std::string pathname = "/Users/brianfrancis/work/milliqan/geant/milliq/geant4/data/";
-    std::string filename = "mCP_UFO/0.1/0.001/hit_4_vecs.dat";
+  std::string pathname = "/Users/brianfrancis/work/milliqan/geant/milliq/geant4/data/";
+  std::string filename = "mCP_UFO/0.1/0.001/hit_4_vecs.dat";
 
-std::cout << std::endl << "opening " << pathname << filename << std::endl;
+  std::cout << std::endl << "opening " << pathname << filename << std::endl;
 
-	infile.open(pathname.append(filename).c_str());
-	G4String line;
-	G4double fe, fq, fm, fx, fy, fz, fpx, fpy, fpz;
-	std::vector<G4double> Tver(3), Tmo(3), Tqme(3);
-	while (std::getline(infile, line)) {
+  infile.open(pathname.append(filename).c_str());
+  G4String line;
+  G4double fe, fq, fm, fx, fy, fz, fpx, fpy, fpz;
+  std::vector<G4double> Tver(3), Tmo(3), Tqme(3);
+  while (std::getline(infile, line)) {
 
-			std::istringstream iss(line);
-			iss.clear();
-			iss.str(line);
+    std::istringstream iss(line);
+    iss.clear();
+    iss.str(line);
 
-			if (!(iss >> fq >> fm >> fx >> fy >> fz >> fpx >> fpy >> fpz))
-				break;
+    if (!(iss >> fq >> fm >> fx >> fy >> fz >> fpx >> fpy >> fpz))
+      break;
 
-			fe = std::sqrt(std::pow(fpx,2)+std::pow(fpy,2)+std::pow(fpz,2)+std::pow(fm,2))-fm;
+    fe = std::sqrt(std::pow(fpx,2)+std::pow(fpy,2)+std::pow(fpz,2)+std::pow(fm,2))-fm;
 
-			Tver[0]=fx;	Tver[1]=fy;	Tver[2]=fz;
-			Tmo[0]=fpx;	Tmo[1]=fpy;	Tmo[2]=fpz;
-			Tqme[0]=fq;	Tqme[1]=fm;	Tqme[2]=fe;
-			MilliQPrimaryGeneratorAction::vertexList.push_back( Tver );
-			momentumList.push_back( Tmo );
-			qmeList.push_back( Tqme );
+    Tver[0]=fx;	Tver[1]=fy;	Tver[2]=fz;
+    Tmo[0]=fpx;	Tmo[1]=fpy;	Tmo[2]=fpz;
+    Tqme[0]=fq;	Tqme[1]=fm;	Tqme[2]=fe;
+    MilliQPrimaryGeneratorAction::vertexList.push_back( Tver );
+    momentumList.push_back( Tmo );
+    qmeList.push_back( Tqme );
 
-	}
+  }
 
-std::cout << std::endl << "found " << momentumList.size() << " events" << std::endl;
+  std::cout << std::endl << "found " << momentumList.size() << " events" << std::endl;
 
 }

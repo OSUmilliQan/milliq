@@ -21,16 +21,12 @@ G4ThreadLocal G4Allocator<MilliQPMTHit>* MilliQPMTHitAllocator=0;
 
 
 MilliQPMTHit::MilliQPMTHit()
-  : G4VHit(), fPmtNumber(-1),fPhotons(0),fPhysVol(0),fDrawit(false), fStackID(-1), fBlockID(-1), fEdep(0.), fTime(0.), fPos(0) {}
+  : G4VHit(), fPmtNumber(-1), fPhotons(0), fPos(0), fPhysVol(0), fDrawit(false), fStackID(-1), fBlockID(-1), fEdep(0.), fTime(0.) {}
 
-MilliQPMTHit::MilliQPMTHit(G4int iCol,G4int iBlock)
-: G4VHit(), fPmtNumber(-1),fPhotons(0),fPhysVol(0),fDrawit(false), fStackID(-1), fBlockID(-1), fEdep(0.), fTime(0.), fPos(0) {}
-
-
-
+MilliQPMTHit::MilliQPMTHit(G4int iCol, G4int iBlock)
+  : G4VHit(), fPmtNumber(-1), fPhotons(0), fPos(0), fPhysVol(0), fDrawit(false), fStackID(-1), fBlockID(-1), fEdep(0.), fTime(0.) {}
 
 MilliQPMTHit::~MilliQPMTHit() {}
-
 
 MilliQPMTHit::MilliQPMTHit(const MilliQPMTHit &right) : G4VHit()
 {

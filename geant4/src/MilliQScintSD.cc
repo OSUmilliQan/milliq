@@ -42,8 +42,8 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-MilliQScintSD::MilliQScintSD(G4String name)
-  : G4VSensitiveDetector(name), NBlocks(0)
+MilliQScintSD::MilliQScintSD(G4String name, const boost::property_tree::ptree pt)
+  : G4VSensitiveDetector(name), NBlocks(0), fPTree(pt)
 {
   fScintCollection = NULL;
   collectionName.insert("scintCollection");
@@ -65,7 +65,7 @@ void MilliQScintSD::Initialize(G4HCofThisEvent* hitsCE){
   }
   hitsCE->AddHitsCollection( hitsCID, fScintCollection );
 
-  MilliQDetectorConstruction* milliqdetector = new MilliQDetectorConstruction;
+  MilliQDetectorConstruction* milliqdetector = new MilliQDetectorConstruction(fPTree);
   NBlocks = milliqdetector->GetNblocksPerStack();
 
 }

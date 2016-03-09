@@ -1,9 +1,14 @@
 #ifndef MilliQRunAction_h
 #define MilliQRunAction_h 1
 
+#include "MilliQDataFormat.hh"
+
 #include "G4UserRunAction.hh"
 #include "globals.hh"
 #include "G4Types.hh"
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 
 class MilliQRecorderBase;
 class MilliQDetectorConstruction;
@@ -14,7 +19,7 @@ class MilliQRunActionMessenger;
 class MilliQRunAction : public G4UserRunAction {
 public:
 
-  MilliQRunAction(MilliQRecorderBase*);
+  MilliQRunAction(MilliQRecorderBase*, const boost::property_tree::ptree pt);
   virtual ~MilliQRunAction();
 
   virtual void BeginOfRunAction(const G4Run*);
@@ -23,6 +28,8 @@ public:
   inline void SetVerbose(G4int verbose) { fVerboseLevel = verbose;}
   inline G4int GetVerbose()             { return fVerboseLevel;}
 
+  void InitializeDetectorParameters(const std::string filename);
+  
 private:
 
   MilliQRecorderBase*           fRecorder;
@@ -30,10 +37,10 @@ private:
   MilliQPrimaryGeneratorAction* fKinematic;
   MilliQRunActionMessenger*     fMilliQRunActionMessenger;
 
+  MilliQDataFormat* dataFormat;
+  
   G4int fVerboseLevel;
 
-  enum MilliQNtupleIds { kScintHits, kAll, kDEDX, kRadius, kPMT0Times, kPMT1Times, kPMT2Times, kNumNtupleIds };
-  
 };
 
 

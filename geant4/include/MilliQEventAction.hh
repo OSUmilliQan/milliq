@@ -32,52 +32,55 @@
 #ifndef MilliQEventAction_h
 #define MilliQEventAction_h 1
 
+#include "MilliQDataFormat.hh"
 #include "MilliQEventMessenger.hh"
 #include "G4UserEventAction.hh"
 #include "globals.hh"
 #include "G4ThreeVector.hh"
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+
 class G4Event;
 class MilliQRecorderBase;
 
-class MilliQEventAction : public G4UserEventAction
-{
-  public:
+class MilliQEventAction : public G4UserEventAction {
+ public:
 
-    MilliQEventAction(MilliQRecorderBase*);
-    virtual ~MilliQEventAction();
+  MilliQEventAction(MilliQRecorderBase*, const boost::property_tree::ptree pt);
+  virtual ~MilliQEventAction();
 
-  public:
+  virtual void BeginOfEventAction(const G4Event*);
+  virtual void EndOfEventAction(const G4Event*);
 
-    virtual void BeginOfEventAction(const G4Event*);
-    virtual void EndOfEventAction(const G4Event*);
+  void SetSaveThreshold(G4int);
 
-    void SetSaveThreshold(G4int );
+  void SetEventVerbose(G4int v){ fVerbose = v;}
 
-    void SetEventVerbose(G4int v){fVerbose=v;}
+  void SetPMTThreshold(G4int t) { fPMTThreshold = t;}
 
-    void SetPMTThreshold(G4int t){fPMTThreshold=t;}
+  void SetForceDrawPhotons(G4bool b) { fForcedrawphotons = b;}
+  void SetForceDrawNoPhotons(G4bool b) { fForcenophotons = b;}
 
-    void SetForceDrawPhotons(G4bool b){fForcedrawphotons=b;}
-    void SetForceDrawNoPhotons(G4bool b){fForcenophotons=b;}
+ private:
 
-  private:
+  MilliQRecorderBase*   fRecorder;
+  MilliQEventMessenger* fEventMessenger;
 
-    MilliQRecorderBase* fRecorder;
-    MilliQEventMessenger* fEventMessenger;
+  G4int fSaveThreshold;
 
-    G4int              fSaveThreshold;
+  G4int fPMTCollID;
+  G4int fPMTAllCollID;
+  G4int fScintCollID;
 
-    G4int              fPMTCollID;
-    G4int			   fPMTAllCollID;
-    G4int              fScintCollID;
+  G4int fVerbose;
 
-    G4int              fVerbose;
+  G4int fPMTThreshold;
 
-    G4int              fPMTThreshold;
+  G4bool fForcedrawphotons;
+  G4bool fForcenophotons;
 
-    G4bool fForcedrawphotons;
-    G4bool fForcenophotons;
+  boost::property_tree::ptree fPTree;
 
 };
 

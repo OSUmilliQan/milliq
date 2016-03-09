@@ -51,25 +51,21 @@ MilliQStackingAction::~MilliQStackingAction() {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4ClassificationOfNewTrack
-MilliQStackingAction::ClassifyNewTrack(const G4Track * aTrack){
+G4ClassificationOfNewTrack MilliQStackingAction::ClassifyNewTrack(const G4Track * aTrack) {
  
-  MilliQUserEventInformation* eventInformation=
-    (MilliQUserEventInformation*)G4EventManager::GetEventManager()
-    ->GetConstCurrentEvent()->GetUserInformation();
+  MilliQUserEventInformation* eventInformation = (MilliQUserEventInformation*)G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetUserInformation();
  
   //Count what process generated the optical photons
-  if(aTrack->GetDefinition()==G4OpticalPhoton::OpticalPhotonDefinition()){
+  if(aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
     // particle is optical photon
-    if(aTrack->GetParentID()>0){
+    if(aTrack->GetParentID() > 0) {
       // particle is secondary
-      if(aTrack->GetCreatorProcess()->GetProcessName()=="Scintillation")
-        eventInformation->IncPhotonCount_Scint();
-      else if(aTrack->GetCreatorProcess()->GetProcessName()=="Cerenkov")
-        eventInformation->IncPhotonCount_Ceren();
+      if(aTrack->GetCreatorProcess()->GetProcessName() == "Scintillation") eventInformation->IncPhotonCount_Scint();
+      else if(aTrack->GetCreatorProcess()->GetProcessName() == "Cerenkov") eventInformation->IncPhotonCount_Ceren();
     }
   }
-  else{
+  else {
+    //    
   }
   return fUrgent;
 }

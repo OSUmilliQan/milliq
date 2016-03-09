@@ -1,28 +1,34 @@
 #include "SimpleSum.h"
 
-void doFit(TString file, TString noiseFile, int npks, double xlo, double xhi) {
+void doFit(TString file, TString noiseFile, bool useNoise, int npks, double xlo, double xhi, bool logy) {
 
   const int npeaks = npks;
   
   gStyle->SetOptFit(1);
 
-  TFile * input = new TFile(file, "READ");
+  TString folder = "data/";
+
+  TFile * input = new TFile(folder + file, "READ");
   TH1D * h_spectrum = (TH1D*)input->Get("energy");
   h_spectrum->Sumw2();
 
-  TFile * noiseInput = new TFile(noiseFile, "READ");
-  TH1D * h_noise = (TH1D*)noiseInput->Get("energy");
-  h_noise->Sumw2();
-
-  // subtract out the (supposed) electronics noise
-  h_spectrum->Add(h_noise, -1.);
-
-  // log y-axis protection -- no negatives
-  for(int i = 0; i < h_spectrum->GetNbinsX(); i++) {
-    if(h_spectrum->GetBinContent(i+1) < 0.) {
-      h_spectrum->SetBinContent(i+1, 0.);
-      h_spectrum->SetBinError(i+1, 0.);
+  if(useNoise) {
+    TFile * noiseInput = new TFile(folder + noiseFile, "READ");
+    TH1D * h_noise = (TH1D*)noiseInput->Get("energy");
+    h_noise->Sumw2();
+    
+    // subtract out the (supposed) electronics noise
+    h_spectrum->Add(h_noise, -1.);
+    
+    // log y-axis protection -- no negatives
+    for(int i = 0; i < h_spectrum->GetNbinsX(); i++) {
+      if(h_spectrum->GetBinContent(i+1) < 0.) {
+	h_spectrum->SetBinContent(i+1, 0.);
+	h_spectrum->SetBinError(i+1, 0.);
+      }
     }
+
+    noiseInput->Close();
   }
 
   // RooFit
@@ -99,7 +105,7 @@ void doFit(TString file, TString noiseFile, int npks, double xlo, double xhi) {
 
   // make a pdf
   TCanvas * canv = new TCanvas("canv", "canv", 10, 10, 2000, 1400);
-  canv->SetLogy(true);
+  if(logy) canv->SetLogy(true);
 
   frame->Draw();
 

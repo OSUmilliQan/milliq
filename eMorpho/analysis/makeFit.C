@@ -3,10 +3,7 @@
 void makeFit() {
 
   gROOT->LoadMacro("SimpleSum.C+");
-
-  TString folder = "../data/";
   
-  //TString file = "SampleData_dark.root";
   TString file = "SampleData_led.root";
   TString noiseFile = "SampleData_dark_noHV.root";
   
@@ -15,5 +12,8 @@ void makeFit() {
 
   int npks = 6;
 
-  doFit(folder + file, folder + noiseFile, npks, xlo, xhi);
+  bool useNoise = false;
+  bool logy = true;
+  
+  doFit(file, noiseFile, useNoise, npks, xlo, xhi, logy);
 }

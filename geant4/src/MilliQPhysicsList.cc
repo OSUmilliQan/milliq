@@ -28,61 +28,57 @@
 
 MilliQPhysicsList::MilliQPhysicsList() : G4VModularPhysicsList()
 {
-    // default cut value  (1.0mm)
-    defaultCutValue = 1.0*mm;
+  // default cut value  (1.0mm)
+  defaultCutValue = 1.0*mm;
 
-    // General Physics
+  // General Physics
   //  RegisterPhysics( new MilliQGeneralPhysics("general") );
 
+  // Radioactive decay
+  RegisterPhysics(new G4RadioactiveDecayPhysics());
+
+  MilliQMonopolePhysics* MonopolePhys = new MilliQMonopolePhysics();
+  //Monopole Physics
+  RegisterPhysics( MonopolePhys );
+
+  //These are the processes contained in the FTFP_BERT PhysList contained in the monopole.cc example
+  G4int ver = 0;
+  // EM physics
+  RegisterPhysics( new G4EmStandardPhysics(ver));
+  // Synchroton Radiation & GN Physics
+  RegisterPhysics( new G4EmExtraPhysics(ver) );
+  //Decays
+  RegisterPhysics( new G4DecayPhysics(ver) );
+  // Hadron Elastic scattering
+  RegisterPhysics( new G4HadronElasticPhysics(ver) );
+  // Hadron Physics
+  //    RegisterPhysics(  new HadronPhysicsFTFP_BERT(ver));
+  // Stopping Physics
+  RegisterPhysics( new G4StoppingPhysics(ver) );
+  // Ion Physics
+  RegisterPhysics( new G4IonPhysics(ver));
+  // Neutron tracking cut
+  RegisterPhysics( new G4NeutronTrackingCut(ver));
+
+  // EM Physics
+  RegisterPhysics( new MilliQEMPhysics("standard EM"));
+
+  // Muon Physics
+  RegisterPhysics( new MilliQMuonPhysics("muon"));
+
+  // Optical Physics
+  G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
+  RegisterPhysics( opticalPhysics );
 
 
+  opticalPhysics->SetScintillationYieldFactor(1.0);
+  opticalPhysics->SetScintillationExcitationRatio(0.0);
 
+  opticalPhysics->SetMaxNumPhotonsPerStep(100);
+  opticalPhysics->SetMaxBetaChangePerStep(10.0);
 
-    // Radioactive decay
-    RegisterPhysics(new G4RadioactiveDecayPhysics());
-
-    MilliQMonopolePhysics* MonopolePhys = new MilliQMonopolePhysics();
-    //Monopole Physics
-    RegisterPhysics( MonopolePhys );
-
-    //These are the processes contained in the FTFP_BERT PhysList contained in the monopole.cc example
-    G4int ver = 0;
-    // EM physics
-    RegisterPhysics( new G4EmStandardPhysics(ver));
-    // Synchroton Radiation & GN Physics
-    RegisterPhysics( new G4EmExtraPhysics(ver) );
-    //Decays
-    RegisterPhysics( new G4DecayPhysics(ver) );
-    // Hadron Elastic scattering
-    RegisterPhysics( new G4HadronElasticPhysics(ver) );
-    // Hadron Physics
-//    RegisterPhysics(  new HadronPhysicsFTFP_BERT(ver));
-    // Stopping Physics
-    RegisterPhysics( new G4StoppingPhysics(ver) );
-    // Ion Physics
-    RegisterPhysics( new G4IonPhysics(ver));
-    // Neutron tracking cut
-    RegisterPhysics( new G4NeutronTrackingCut(ver));
-
-   // EM Physics
-   RegisterPhysics( new MilliQEMPhysics("standard EM"));
-
-    // Muon Physics
-    RegisterPhysics( new MilliQMuonPhysics("muon"));
-
-    // Optical Physics
-    G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
-    RegisterPhysics( opticalPhysics );
-
-
-    opticalPhysics->SetScintillationYieldFactor(1.0);
-    opticalPhysics->SetScintillationExcitationRatio(0.0);
-
-    opticalPhysics->SetMaxNumPhotonsPerStep(100);
-    opticalPhysics->SetMaxBetaChangePerStep(10.0);
-
-    opticalPhysics->SetTrackSecondariesFirst(kCerenkov,true);
-    opticalPhysics->SetTrackSecondariesFirst(kScintillation,true);
+  opticalPhysics->SetTrackSecondariesFirst(kCerenkov,true);
+  opticalPhysics->SetTrackSecondariesFirst(kScintillation,true);
 
 }
 
