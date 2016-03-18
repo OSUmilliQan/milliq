@@ -4,6 +4,24 @@
 #include "g4root.hh"
 #include "G4Types.hh"
 
+#include <vector>
+#include <boost/lexical_cast.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+
+template<typename T> std::vector<T> ptree_array(const boost::property_tree::ptree pt, const std::string sEntry, const G4double unit) {
+
+  const std::string sConfig = pt.get<std::string>(sEntry);
+
+  std::vector<T> v;
+  std::stringstream ss(sConfig);
+  std::string item;
+
+  while(std::getline(ss, item, ',')) v.push_back(boost::lexical_cast<T>(item) * unit);
+
+  return v;
+};
+
 class MilliQDataFormat {
  public:
 
@@ -28,7 +46,7 @@ class MilliQDataFormat {
   virtual void CreateNtuples();
 
   G4AnalysisManager* analysisManager;
-  
+
   G4int fVerboseLevel;
 };
 

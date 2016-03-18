@@ -16,8 +16,8 @@
 #include "G4SDManager.hh"
 #include "G4HCofThisEvent.hh"
 
-MilliQPMTSD::MilliQPMTSD(G4String name, const boost::property_tree::ptree pt)
-  : G4VSensitiveDetector(name),fPMTHitCollection(0), fPMTAllHitCollection(0), NBlocks(0), fPTree(pt)
+MilliQPMTSD::MilliQPMTSD(G4String name, const G4int numBlocks, const G4int numStacks)
+  : G4VSensitiveDetector(name),fPMTHitCollection(0), fPMTAllHitCollection(0), NBlocks(numBlocks), NStacks(numStacks)
 {
   collectionName.insert("pmtHitCollection");
   collectionName.insert("pmtAllHitCollection");
@@ -47,13 +47,6 @@ void MilliQPMTSD::Initialize(G4HCofThisEvent* hitsCE) {
     AllhitCID = G4SDManager::GetSDMpointer()->GetCollectionID(fPMTAllHitCollection);
   }
   hitsCE->AddHitsCollection( AllhitCID, fPMTAllHitCollection );
-
-  // durp, to do: no need to re-construct the whole detector to just get this one piece of info
-  // just get the NBlocks from fPTree
-  
-  MilliQDetectorConstruction* milliqdetector = new MilliQDetectorConstruction(fPTree);
-  NBlocks = milliqdetector->GetNblocksPerStack();
-  G4int NStacks = milliqdetector->GetNstacks();
 
   // fill calorimeter hits with zero energy deposition
   for(G4int iStack = 0; iStack < NStacks; iStack++) {

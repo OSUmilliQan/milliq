@@ -49,19 +49,20 @@ class MilliQSteppingAction : public G4UserSteppingAction {
 
 public:
 
-  MilliQSteppingAction(MilliQRecorderBase*, const boost::property_tree::ptree pt);
+  MilliQSteppingAction(MilliQRecorderBase*, const G4int geometryVersion);
   virtual ~MilliQSteppingAction();
   virtual void UserSteppingAction(const G4Step*);
 
   void SetOneStepPrimaries(G4bool b) { fOneStepPrimaries = b; }
   G4bool GetOneStepPrimaries() { return fOneStepPrimaries; }
- 
+
 private:
 
   MilliQRecorderBase* fRecorder;
   G4bool fOneStepPrimaries;
   MilliQSteppingMessenger* fSteppingMessenger;
-  MilliQDetectorConstruction* milliqdetector;
+
+  const G4int fAlternate;
 
   G4OpBoundaryProcessStatus fExpectedNextStatus;
 };

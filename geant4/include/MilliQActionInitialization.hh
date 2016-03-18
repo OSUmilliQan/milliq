@@ -33,6 +33,8 @@
 
 #include "G4VUserActionInitialization.hh"
 
+#include "G4types.hh"
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
@@ -43,9 +45,10 @@ class B4DetectorConstruction;
 ///
 
 class MilliQActionInitialization : public G4VUserActionInitialization {
-  
+
 public:
-  MilliQActionInitialization(MilliQRecorderBase* recorder, const boost::property_tree::ptree pt): G4VUserActionInitialization(), fRecorder(recorder), fPTree(pt) {}
+  MilliQActionInitialization(MilliQRecorderBase* recorder, const G4int numBlocks, const G4int numStacks, const G4int geometryVersion, const boost::property_tree::ptree pt)
+    : G4VUserActionInitialization(), fRecorder(recorder), NBlocks(numBlocks), NStacks(numStacks), fAlternate(geometryVersion), fPTree(pt) {}
   virtual ~MilliQActionInitialization() {};
 
   virtual void BuildForMaster() const;
@@ -55,7 +58,13 @@ public:
 
 private:
   MilliQRecorderBase* fRecorder;
-  boost::property_tree::ptree fPTree;
+
+  const G4int NBlocks;
+  const G4int NStacks;
+  const G4int fAlternate;
+
+  const boost::property_tree::ptree fPTree;
+
 };
 
 #endif

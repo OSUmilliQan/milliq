@@ -194,7 +194,7 @@ void MilliQPrimaryGeneratorAction::SetCalibEnergy(G4double e) {
 void MilliQPrimaryGeneratorAction::GetLHEFourVectors() {
   std::ifstream infile;
 
-  std::string pathname = "/Users/brianfrancis/work/milliqan/geant/milliq/geant4/data/";
+  std::string pathname = "/data/users/MilliQan/acceptances_v3/";
   std::string filename = "mCP_UFO/0.1/0.001/hit_4_vecs.dat";
 
   std::cout << std::endl << "opening " << pathname << filename << std::endl;

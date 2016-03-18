@@ -56,13 +56,13 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-MilliQEventAction::MilliQEventAction(MilliQRecorderBase* r, const boost::property_tree::ptree pt)
+MilliQEventAction::MilliQEventAction(MilliQRecorderBase* r, const G4int numBlocks, const G4int numStacks)
   : fRecorder(r), fSaveThreshold(0), fPMTCollID(-1), fPMTAllCollID(-1), fScintCollID(-1), fVerbose(0),
-    fPMTThreshold(1), fForcedrawphotons(false), fForcenophotons(false), fPTree(pt)
+    fPMTThreshold(1), fForcedrawphotons(false), fForcenophotons(false), NBlocks(numBlocks), NStacks(numStacks)
 {
   fEventMessenger = new MilliQEventMessenger(this);
 }
- 
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 MilliQEventAction::~MilliQEventAction(){}
@@ -70,7 +70,7 @@ MilliQEventAction::~MilliQEventAction(){}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void MilliQEventAction::BeginOfEventAction(const G4Event* anEvent){
- 
+
   //New event, add the user information object
   G4EventManager::GetEventManager()->SetUserInformation(new MilliQUserEventInformation);
 
@@ -81,7 +81,7 @@ void MilliQEventAction::BeginOfEventAction(const G4Event* anEvent){
 
   if(fRecorder)fRecorder->RecordBeginOfEvent(anEvent);
 }
- 
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void MilliQEventAction::EndOfEventAction(const G4Event* anEvent){
@@ -90,9 +90,9 @@ void MilliQEventAction::EndOfEventAction(const G4Event* anEvent){
 
   MilliQUserEventInformation* eventInformation
     =(MilliQUserEventInformation*)anEvent->GetUserInformation();
- 
+
   G4TrajectoryContainer* trajectoryContainer=anEvent->GetTrajectoryContainer();
- 
+
   G4int n_trajectories = 0;
   if (trajectoryContainer) n_trajectories = trajectoryContainer->entries();
 
@@ -109,7 +109,7 @@ void MilliQEventAction::EndOfEventAction(const G4Event* anEvent){
       trj->DrawTrajectory();
     }
   }
- 
+
   MilliQScintHitsCollection* scintHC = 0;
   MilliQPMTHitsCollection* pmtHC = 0;
   MilliQPMTHitsCollection* pmtAllHC = 0;
@@ -182,7 +182,7 @@ void MilliQEventAction::EndOfEventAction(const G4Event* anEvent){
         (*pmtHC)[i]->SetDrawit(false);
       }
     }
- 
+
     if(eventInformation->GetHitCount()>0){//dont bother unless there were hits
       reconPos/=eventInformation->GetHitCount();
       if(fVerbose>0){
@@ -193,12 +193,6 @@ void MilliQEventAction::EndOfEventAction(const G4Event* anEvent){
     }
     pmtHC->DrawAllHits();
   }
-
-  // durp -- no need to reconstruct the detector so many times
-  
-  MilliQDetectorConstruction* milliqdetector = new MilliQDetectorConstruction(fPTree);
-  G4int NBlocks = milliqdetector->GetNblocksPerStack();
-  G4int NStacks = milliqdetector->GetNstacks();
 
   std::vector< std::vector<G4double> >  pmtTime(NBlocks*NStacks);//we want the first scintillator hit, and the first pmt hit
   std::vector< std::vector<G4double> >  scintTime(NBlocks*NStacks);//we want the first scintillator hit, and the first pmt hit
@@ -238,7 +232,7 @@ void MilliQEventAction::EndOfEventAction(const G4Event* anEvent){
     for(G4int i = 0; i < NStacks; i++){
 
       pmt = mcpan->GetActiveEv()[i];
-      
+
       analysisManager->FillNtupleIColumn(MilliQDataFormat::kAll, i, pmt);
       analysisManager->FillNtupleDColumn(MilliQDataFormat::kAll, i + NStacks, mcpan->GetPMTTimes()[i]/ns);
       analysisManager->FillNtupleDColumn(MilliQDataFormat::kAll, i + 2*NStacks, mcpan->GetTimeOfFlight()[i]/ns);

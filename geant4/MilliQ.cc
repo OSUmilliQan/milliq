@@ -27,7 +27,6 @@
 #include "G4UIExecutive.hh"
 #endif
 
-
 int main(int argc, char** argv) {
 
 #ifdef G4MULTITHREADED
@@ -37,11 +36,13 @@ int main(int argc, char** argv) {
 #endif
 
   boost::property_tree::ptree pt;
+  boost::property_tree::ptree pt_geometry;
 
-  // Read detector properties from external file
+  // Read primary configuration file
   std::string configFile = (argc >= 3) ? argv[2] : "config/default.ini";
   try {
     boost::property_tree::ini_parser::read_ini(configFile, pt); // std::string, ptree
+    boost::property_tree::ini_parser::read_ini(pt.get<std::string>("Configuration.GeometryConfigFile"), pt_geometry);
   }
   catch(boost::property_tree::ptree_error &e) {
     G4ExceptionDescription msg;
@@ -49,11 +50,18 @@ int main(int argc, char** argv) {
     G4Exception("MilliQ::main()", "MilliQ::ConfigFileReadError", FatalException, msg);
   }
 
+  const G4int geometryVersion = pt.get<G4int>("Configuration.Version");
+
+  const G4int NBlocks = pt_geometry.get<G4int>("DetectorGeometry.NBlocks_X") *
+                        pt_geometry.get<G4int>("DetectorGeometry.NBlocks_Y") *
+                        pt_geometry.get<G4int>("DetectorGeometry.NBlocks_Z");
+  const G4int NStacks = pt_geometry.get<G4int>("DetectorGeometry.NStacks");
+
   runManager->SetUserInitialization(new MilliQDetectorConstruction(pt));
   runManager->SetUserInitialization(new MilliQPhysicsList());
 
   MilliQRecorderBase* recorder = NULL; //No recording is done in this example
-  runManager->SetUserInitialization(new MilliQActionInitialization(recorder, pt));
+  runManager->SetUserInitialization(new MilliQActionInitialization(recorder, NBlocks, NStacks, geometryVersion, pt));
 
 #ifdef G4VIS_USE
   G4VisManager* visManager = new G4VisExecutive("Quiet");

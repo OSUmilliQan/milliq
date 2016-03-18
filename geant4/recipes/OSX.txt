@@ -42,4 +42,3 @@ cd ~/YOUR_WORK_DIR/build
 
 cd ~/YOUR_WORK_DIR/build
 ./MilliQ ../milliq/RootAnalysis/mcp.mac
-

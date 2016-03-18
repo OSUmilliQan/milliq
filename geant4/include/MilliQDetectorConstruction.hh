@@ -42,6 +42,11 @@ public:
 
   void ConstructCheckGeometry();
 
+  void ReadConfiguration();
+  void ReadGeometryConfiguration();
+  void ReadScintillatorConfiguration();
+  void ReadPMTConfiguration();
+
   //Functions to modify the geometry
   void SetMagField(G4double);
   void SetHousingThickness(G4double );
@@ -51,8 +56,8 @@ public:
   //Get values
   G4double GetHousingThickness(){return fD_mtl;}
   G4double GetPMTRadius(){return fOuterRadius_pmt;}
-  G4int GetNblocksPerStack(){return NBlocks.x()*NBlocks.y()*NBlocks.z();}
-  G4int GetNstacks(){return NStacks ;}
+  G4int GetNblocksPerStack() { return NBlocks.x() * NBlocks.y() * NBlocks.z(); }
+  G4int GetNstacks(){return NStacks;}
   G4int GetAlternateGeometry(){return fAlternate;}
   inline const G4Material* GetScintMaterial() {return fScintillatorMaterial;};
 
@@ -61,7 +66,6 @@ public:
 
   void SetMainScintYield(G4double );
   void DefineMaterials();
-  void DefineMaterialsStewart();
 
 private:
 
@@ -73,9 +77,6 @@ private:
   G4VPhysicalVolume* fWorldPVCheckPhysics;
   G4LogicalVolume* worldLV;
   G4LogicalVolume* fMagneticVolume;
-
-  // Configuration
-  const boost::property_tree::ptree fPTree;
 
   //Materials & Elements
   G4Material* fScintillatorMaterial;
@@ -95,6 +96,20 @@ private:
   G4double fScintHouseThick;
   G4double fLightGuideLength;
   G4double fScintillatorHouseRefl;
+
+  G4double fScintDensity;
+  G4int fScintCarbonContent;
+  G4int fScintHydrogenContent;
+
+  G4double fScintillationYield;
+  G4double fScinitResolutionScale;
+  G4double fScintFastTimeConstant;
+  G4double fScintFastRiseTime;
+  G4double fScintSlowTimeConstant;
+  G4double fScintYieldRatio;
+
+  G4double fScintBirksConstant;
+
   G4double fPmtRad;
   G4double fPmtPhotoRad;
   G4double fPmtPhotoHeight;
@@ -118,11 +133,28 @@ private:
 
   G4Cache<MilliQMonopoleFieldSetup*> fEmFieldSetup;
 
+  std::vector<G4double> fEmissionEnergies;
+
+  G4MaterialPropertyVector * fScintRelativeOutput;
+  G4MaterialPropertyVector * fScintRIndex;
+  G4MaterialPropertyVector * fScintAbsLength;
+
+  G4MaterialPropertyVector * fGlassRIndex;
+  G4MaterialPropertyVector * fGlassAbsLength;
+
+  G4MaterialPropertyVector * fVacuumRIndex;
+
   G4MaterialPropertiesTable* fScintillator_mt;
 
   //Sensitive Detectors
   G4Cache<MilliQPMTSD*> fPmt_SD;
   G4Cache<MilliQScintSD*> fScint_SD;
+
+  // Configuration
+  const boost::property_tree::ptree fPTree;
+  boost::property_tree::ptree fGeometryPTree;
+  boost::property_tree::ptree fScintillatorPTree;
+  boost::property_tree::ptree fPMTPTree;
 
 };
 

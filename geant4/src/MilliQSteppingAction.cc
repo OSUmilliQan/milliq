@@ -58,20 +58,14 @@
 #include "G4ParticleTypes.hh"
 #include "G4Electron.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+MilliQSteppingAction::MilliQSteppingAction(MilliQRecorderBase* r, const G4int geometryVersion) : fRecorder(r), fOneStepPrimaries(false), fAlternate(geometryVersion) {
 
-MilliQSteppingAction::MilliQSteppingAction(MilliQRecorderBase* r, const boost::property_tree::ptree pt) : fRecorder(r), fOneStepPrimaries(false) {
-  milliqdetector = new MilliQDetectorConstruction(pt);
   fSteppingMessenger = new MilliQSteppingMessenger(this);
 
   fExpectedNextStatus = Undefined;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 MilliQSteppingAction::~MilliQSteppingAction() {}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void MilliQSteppingAction::UserSteppingAction(const G4Step * theStep) {
 
@@ -91,7 +85,7 @@ void MilliQSteppingAction::UserSteppingAction(const G4Step * theStep) {
   G4OpBoundaryProcessStatus boundaryStatus = Undefined;
   static G4ThreadLocal G4OpBoundaryProcess* boundary = NULL;
 
-  bool IsRadius = (milliqdetector->GetAlternateGeometry() == 1 && theTrack->GetParentID() == 0);
+  bool IsRadius = (fAlternate == 1 && theTrack->GetParentID() == 0);
 
   if(IsRadius) {
     G4cout<<"It got to the alternate geometry"<<G4endl;

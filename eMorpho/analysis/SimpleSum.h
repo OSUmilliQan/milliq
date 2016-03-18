@@ -1,3 +1,6 @@
+#ifndef SIMPLESUM_H
+#define SIMPLESUM_H
+
 #ifndef __CINT__
 #include "RooGlobalFunc.h"
 #else
@@ -28,11 +31,11 @@ class RooNDKeysPdf;
 #include <vector>
 
 #ifndef __CINT__
-#include "RooCFunction1Binding.h" 
+#include "RooCFunction1Binding.h"
 #include "RooCFunction3Binding.h"
 #endif
 
-#include "RooTFnBinding.h" 
+#include "RooTFnBinding.h"
 //#include "PhysicsTools/TagAndProbe/interface/RooCMSShape.h"
 
 using namespace RooFit;
@@ -41,7 +44,7 @@ using namespace std;
 struct PeakInfo {
   double mean;
   double meanError;
-  
+
   double sigma;
   double sigmaError;
 
@@ -120,3 +123,5 @@ Double_t RooCMSShape::evaluate() const {
   else u = exp(-u);   //exponential decay
   return erf*u;
 }
+
+#endif

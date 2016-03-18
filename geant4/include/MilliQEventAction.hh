@@ -47,7 +47,7 @@ class MilliQRecorderBase;
 class MilliQEventAction : public G4UserEventAction {
  public:
 
-  MilliQEventAction(MilliQRecorderBase*, const boost::property_tree::ptree pt);
+  MilliQEventAction(MilliQRecorderBase*, const G4int numBlocks, const G4int numStacks);
   virtual ~MilliQEventAction();
 
   virtual void BeginOfEventAction(const G4Event*);
@@ -80,7 +80,8 @@ class MilliQEventAction : public G4UserEventAction {
   G4bool fForcedrawphotons;
   G4bool fForcenophotons;
 
-  boost::property_tree::ptree fPTree;
+  const G4int NBlocks;
+  const G4int NStacks;
 
 };
 

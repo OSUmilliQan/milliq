@@ -1,12 +1,13 @@
+#ifndef SIMPLESUM_C
+#define SIMPLESUM_C
+
 #include "SimpleSum.h"
 
-void doFit(TString file, TString noiseFile, bool useNoise, int npks, double xlo, double xhi, bool logy) {
+void doFit(TString folder, TString file, TString noiseFile, bool useNoise, int npks, double xlo, double xhi, bool logy) {
 
   const int npeaks = npks;
-  
-  gStyle->SetOptFit(1);
 
-  TString folder = "data/";
+  gStyle->SetOptFit(1);
 
   TFile * input = new TFile(folder + file, "READ");
   TH1D * h_spectrum = (TH1D*)input->Get("energy");
@@ -16,10 +17,10 @@ void doFit(TString file, TString noiseFile, bool useNoise, int npks, double xlo,
     TFile * noiseInput = new TFile(folder + noiseFile, "READ");
     TH1D * h_noise = (TH1D*)noiseInput->Get("energy");
     h_noise->Sumw2();
-    
+
     // subtract out the (supposed) electronics noise
     h_spectrum->Add(h_noise, -1.);
-    
+
     // log y-axis protection -- no negatives
     for(int i = 0; i < h_spectrum->GetNbinsX(); i++) {
       if(h_spectrum->GetBinContent(i+1) < 0.) {
@@ -32,7 +33,7 @@ void doFit(TString file, TString noiseFile, bool useNoise, int npks, double xlo,
   }
 
   // RooFit
-  
+
   RooRealVar x("x", "x", xlo, xhi);
 
   vector<RooRealVar*> means, sigmas;
@@ -40,7 +41,7 @@ void doFit(TString file, TString noiseFile, bool useNoise, int npks, double xlo,
   vector<RooRealVar*> sigFractions;
   RooArgList pdfs;
   RooArgList coeffs;
-  
+
   // create npeaks: RooGaussian(name, title, x, mean, sigma)
   for(int i = 0; i < npeaks; i++) {
     TString q_name = Form("q%d", i);
@@ -48,7 +49,7 @@ void doFit(TString file, TString noiseFile, bool useNoise, int npks, double xlo,
     means.push_back(var);
 
     TString s_name = Form("sigma%d", i);
-    RooRealVar * var2 = new RooRealVar(s_name, s_name, 5, 0, 50);
+    RooRealVar * var2 = new RooRealVar(s_name, s_name, 5, 0, 200);
     sigmas.push_back(var2);
 
     TString peak_name = Form("Peak%d", i);
@@ -78,7 +79,7 @@ void doFit(TString file, TString noiseFile, bool useNoise, int npks, double xlo,
 
   RooCMSShape rBkg("cmsShapeBkg", "cmsShapeBkg", x, cms_alpha, cms_beta, cms_gamma, cms_peak);
   pdfs.add(rBkg);
-  
+
   // total fit shape
   RooAddPdf response("response", "response", pdfs, coeffs);
 
@@ -89,7 +90,7 @@ void doFit(TString file, TString noiseFile, bool useNoise, int npks, double xlo,
   /////////////////////////////////
   // RooFit plot
   /////////////////////////////////
-  
+
   RooPlot * frame = x.frame(Title("PMT spectrum"));
 
   // draw parameter box
@@ -114,7 +115,7 @@ void doFit(TString file, TString noiseFile, bool useNoise, int npks, double xlo,
   cout << endl << endl;
   cout << "chi2 = " << frame->chiSquare();
   cout << endl << endl;
-  
+
   // now output stuff
   TFile * output = new TFile("output.root", "RECREATE");
 
@@ -157,8 +158,10 @@ void doFit(TString file, TString noiseFile, bool useNoise, int npks, double xlo,
     h_sigmas->SetBinContent(i+1, infos[i].sigma);
     h_sigmas->SetBinError(i+1, infos[i].sigmaError);
   }
-  
+
   output->Write();
   output->Close();
-  
+
 }
+
+#endif

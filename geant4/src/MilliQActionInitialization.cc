@@ -24,9 +24,9 @@ void MilliQActionInitialization::Build() const {
   SetUserAction(new MilliQStackingAction());
 
   SetUserAction(new MilliQRunAction(fRecorder, fPTree));
-  SetUserAction(new MilliQEventAction(fRecorder, fPTree));
+  SetUserAction(new MilliQEventAction(fRecorder, NBlocks, NStacks));
   SetUserAction(new MilliQTrackingAction(fRecorder));
-  SetUserAction(new MilliQSteppingAction(fRecorder, fPTree));
+  SetUserAction(new MilliQSteppingAction(fRecorder, fAlternate));
 }
 
 G4VSteppingVerbose* MilliQActionInitialization::InitializeSteppingVerbose() const {
