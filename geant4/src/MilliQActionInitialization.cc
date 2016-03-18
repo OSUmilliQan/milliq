@@ -11,7 +11,7 @@
 
 #include "MilliQRecorderBase.hh"
 
-#include "G4types.hh"
+#include "G4Types.hh"
 
 void MilliQActionInitialization::BuildForMaster() const {
   SetUserAction(new MilliQRunAction(fRecorder, fPTree));

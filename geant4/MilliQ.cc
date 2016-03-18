@@ -6,7 +6,7 @@
 
 #include "G4UImanager.hh"
 #include "G4String.hh"
-#include "G4types.hh"
+#include "G4Types.hh"
 
 #include "MilliQPhysicsList.hh"
 #include "MilliQDetectorConstruction.hh"
