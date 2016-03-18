@@ -20,7 +20,7 @@ template<typename T> std::vector<T> ptree_array(const boost::property_tree::ptre
   while(std::getline(ss, item, ',')) v.push_back(boost::lexical_cast<T>(item) * unit);
 
   return v;
-};
+}
 
 class MilliQDataFormat {
  public:
