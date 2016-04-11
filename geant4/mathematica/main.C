@@ -48,6 +48,17 @@ Solve for Nsig:
 
 }
 
+Accept[EffAll.size()][massList.size()];
+for(i, j, k) {
+  if(massList(k, i) == EffAll(k, j, 1)) {
+    Accept(k, i) = EffAll(k, j);
+  }
+
+ }
+
+AcceptCount = 
+    
+
 
 
 

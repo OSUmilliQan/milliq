@@ -42,39 +42,39 @@ class MilliQUserEventInformation : public G4VUserEventInformation
     MilliQUserEventInformation();
     virtual ~MilliQUserEventInformation();
 
-    inline virtual void Print()const{};
+    inline virtual void Print() const{};
 
-    void IncPhotonCount_Scint(){fPhotonCount_Scint++;}
-    void IncPhotonCount_Ceren(){fPhotonCount_Ceren++;}
-    void IncEDep(G4double dep){fTotE+=dep;}
-    void IncAbsorption(){fAbsorptionCount++;}
-    void IncBoundaryAbsorption(){fBoundaryAbsorptionCount++;}
-    void IncHitCount(G4int i=1){fHitCount+=i;}
+    void IncPhotonCount_Scint() { fPhotonCount_Scint++; }
+    void IncPhotonCount_Ceren() { fPhotonCount_Ceren++; }
+    void IncEDep(G4double dep) { fTotE += dep; }
+    void IncAbsorption() { fAbsorptionCount++; }
+    void IncBoundaryAbsorption() { fBoundaryAbsorptionCount++; }
+    void IncHitCount(G4int i = 1) { fHitCount += i; }
 
-    void SetEWeightPos(const G4ThreeVector& p){fEWeightPos=p;}
-    void SetReconPos(const G4ThreeVector& p){fReconPos=p;}
-    void SetConvPos(const G4ThreeVector& p){fConvPos=p;fConvPosSet=true;}
-    void SetPosMax(const G4ThreeVector& p,G4double edep){fPosMax=p;fEdepMax=edep;}
+    void SetEWeightPos(const G4ThreeVector& p) { fEWeightPos = p; }
+    void SetReconPos(const G4ThreeVector& p) { fReconPos = p; }
+    void SetConvPos(const G4ThreeVector& p) { fConvPos = p; fConvPosSet = true; }
+    void SetPosMax(const G4ThreeVector& p, G4double edep) { fPosMax = p; fEdepMax = edep; }
 
-    G4int GetPhotonCount_Scint()const {return fPhotonCount_Scint;}
-    G4int GetPhotonCount_Ceren()const {return fPhotonCount_Ceren;}
-    G4int GetHitCount()const {return fHitCount;}
-    G4double GetEDep()const {return fTotE;}
-    G4int GetAbsorptionCount()const {return fAbsorptionCount;}
-    G4int GetBoundaryAbsorptionCount() const {return fBoundaryAbsorptionCount;}
+    G4int GetPhotonCount_Scint() const { return fPhotonCount_Scint; }
+    G4int GetPhotonCount_Ceren() const { return fPhotonCount_Ceren; }
+    G4int GetHitCount() const { return fHitCount; }
+    G4double GetEDep() const { return fTotE; }
+    G4int GetAbsorptionCount() const { return fAbsorptionCount; }
+    G4int GetBoundaryAbsorptionCount() const { return fBoundaryAbsorptionCount; }
 
-    G4ThreeVector GetEWeightPos(){return fEWeightPos;}
-    G4ThreeVector GetReconPos(){return fReconPos;}
-    G4ThreeVector GetConvPos(){return fConvPos;}
-    G4ThreeVector GetPosMax(){return fPosMax;}
-    G4double GetEDepMax(){return fEdepMax;}
-    G4double IsConvPosSet(){return fConvPosSet;}
+    G4ThreeVector GetEWeightPos() { return fEWeightPos; }
+    G4ThreeVector GetReconPos() { return fReconPos; }
+    G4ThreeVector GetConvPos() { return fConvPos; }
+    G4ThreeVector GetPosMax() { return fPosMax; }
+    G4double GetEDepMax() { return fEdepMax; }
+    G4double IsConvPosSet() { return fConvPosSet; }
 
     //Gets the total photon count produced
-    G4int GetPhotonCount(){return fPhotonCount_Scint+fPhotonCount_Ceren;}
+    G4int GetPhotonCount() { return fPhotonCount_Scint+fPhotonCount_Ceren; }
 
-    void IncPMTSAboveThreshold(){fPMTsAboveThreshold++;}
-    G4int GetPMTSAboveThreshold(){return fPMTsAboveThreshold;}
+    void IncPMTSAboveThreshold() { fPMTsAboveThreshold++; }
+    G4int GetPMTSAboveThreshold() { return fPMTsAboveThreshold; }
 
   private:
 

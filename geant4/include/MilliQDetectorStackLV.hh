@@ -17,31 +17,32 @@
 class MilliQDetectorStackLV : public G4LogicalVolume
 {
 public:
-    
+
     MilliQDetectorStackLV(G4VSolid*               pSolid,
-                        G4Material*             pMaterial,
-                        const G4String&         pName,
-                        G4FieldManager*         pFieldManager,
-                        G4VSensitiveDetector*   pSD,
-                        G4UserLimits*           pUserLimits,
-                        G4bool                  pOptimise,
-                        
-                        G4ThreeVector           pNumberOfBlocks,
-                        G4ThreeVector           pBetweenBlockSpacing,
-                        
-                        G4ThreeVector           pScintillatorDimensions,
-                        G4double                pScintillatorHousingThickness,
-						G4double				pLightGuideLength,
-                        G4double                pScintillatorHousingReflectivity,
-                        
-                        G4double                pPmtPhotocathodeRadius,
-                        G4double                pPmtPhotocathodeHeight,
-                        G4double                pLGHousingReflectivity,
-                        G4VSensitiveDetector*   pPmtSD,
-						G4VSensitiveDetector*   pScintSD);
-    
-    G4ThreeVector GetDimensions(){return fStackDimensions;}
-    
+                          G4Material*             pMaterial,
+                          const G4String&         pName,
+                          G4FieldManager*         pFieldManager,
+                          G4VSensitiveDetector*   pSD,
+                          G4UserLimits*           pUserLimits,
+                          G4bool                  pOptimise,
+
+                          G4ThreeVector           pNumberOfBlocks,
+                          G4ThreeVector           pBetweenBlockSpacing,
+
+                          G4ThreeVector           pScintillatorDimensions,
+                          G4double                pScintillatorHousingThickness,
+						              G4double				        pLightGuideLength,
+                          G4MaterialPropertiesTable * pScintillatorHousingPT,
+
+                          G4double                pPmtPhotocathodeRadius,
+                          G4double                pPmtPhotocathodeHeight,
+                          G4MaterialPropertiesTable * pLGHousingPT,
+                          G4MaterialPropertiesTable * pPmtPT,
+                          G4VSensitiveDetector*   pPmtSD,
+						              G4VSensitiveDetector*   pScintSD);
+
+    G4ThreeVector GetDimensions() { return fStackDimensions; }
+
 private:
     MilliQDetectorBlockParameterisation* fDetectorBlockParameterisation;
     G4ThreeVector fStackDimensions;

@@ -31,10 +31,10 @@
 //---------------------------------------------------------------------------
 //
 // ClassName:   MilliQMonopole
-//  
-// Description: 
 //
-// Authors:   21.03.05  V.Ivanchenko 
+// Description:
+//
+// Authors:   21.03.05  V.Ivanchenko
 //
 // Modified:
 //
@@ -59,13 +59,12 @@ G4double    MilliQMonopole::magCharge = 0.0;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-MilliQMonopole::MilliQMonopole(
-       const G4String&     aName,        G4double            mass,
-       G4double            width,        G4double            charge,   
-       G4int               iSpin,        G4int               iParity,    
-       G4int               iConjugation, G4int               iIsospin,   
+MilliQMonopole::MilliQMonopole(const G4String&     aName,        G4double            mass,
+       G4double            width,        G4double            charge,
+       G4int               iSpin,        G4int               iParity,
+       G4int               iConjugation, G4int               iIsospin,
        G4int               iIsospin3,    G4int               gParity,
-       const G4String&     pType,        G4int               lepton,      
+       const G4String&     pType,        G4int               lepton,
        G4int               baryon,       G4int               encoding,
        G4bool              stable,       G4double            lifetime,
        G4DecayTable        *decaytable)
@@ -80,29 +79,29 @@ MilliQMonopole::~MilliQMonopole()
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
-//     
+//
 //    Arguments for constructor are as follows
 //               name             mass          width         charge
 //             2*spin           parity  C-conjugation
 //          2*Isospin       2*Isospin3       G-parity
 //               type    lepton number  baryon number   PDG encoding
-//             stable         lifetime    decay table 
+//             stable         lifetime    decay table
 //
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 MilliQMonopole* MilliQMonopole::MonopoleDefinition(G4double mass, G4double mCharge,
                                            G4double eCharge)
-{    
+{
   if(!theMonopole) {
     magCharge = eplus * mCharge / fine_structure_const * 0.5;
     theMonopole = new MilliQMonopole(
-       "monopole",         mass,       0.0*MeV,       eplus*eCharge, 
-                0,               0,             0,          
-                0,               0,             0,             
+       "monopole",         mass,       0.0*MeV,       eplus*eCharge,
+                0,               0,             0,
+                0,               0,             0,
           "fermion",               0,             0,           0,
              true,            -1.0,             0);
-    
-    
+
+
     G4cout << "Monopole is created: m(GeV)= " << theMonopole->GetPDGMass()/GeV
            << " Qel= " << theMonopole->GetPDGCharge()/eplus
            << " Qmag= " << magCharge/eplus
@@ -115,10 +114,10 @@ MilliQMonopole* MilliQMonopole::MonopoleDefinition(G4double mass, G4double mChar
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 MilliQMonopole* MilliQMonopole::Monopole()
-{    
+{
   if(!theMonopole) { theMonopole = MonopoleDefinition(); }
   return theMonopole;
-} 
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
@@ -128,4 +127,3 @@ G4double MilliQMonopole::MagneticCharge() const
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
-

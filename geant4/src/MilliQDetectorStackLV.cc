@@ -10,27 +10,28 @@
 
 
 MilliQDetectorStackLV::MilliQDetectorStackLV(G4VSolid*               pSolid,
-                                         G4Material*             pMaterial,
-                                         const G4String&         pName,
-                                         G4FieldManager*         pFieldManager,
-                                         G4VSensitiveDetector*   pSD,
-                                         G4UserLimits*           pUserLimits,
-                                         G4bool                  pOptimise,
-                                         
-                                         G4ThreeVector           pNumberOfBlocks,
-                                         G4ThreeVector           pBetweenBlockSpacing,
-                                         
-                                         G4ThreeVector           pScintillatorDimensions,
-                                         G4double                pScintillatorHousingThickness,
-										 G4double				 pLightGuideLength,
-                                         G4double                pScintillatorHousingReflectivity,
-                                         
-                                         G4double                pPmtPhotocathodeRadius,
-                                         G4double                pPmtPhotocathodeHeight,
-                                         G4double                pLGHousingReflectivity,
-                                         G4VSensitiveDetector*   pPmtSD,
-										 G4VSensitiveDetector*   pScintSD)
-                    :G4LogicalVolume(pSolid,
+                                             G4Material*             pMaterial,
+                                             const G4String&         pName,
+                                             G4FieldManager*         pFieldManager,
+                                             G4VSensitiveDetector*   pSD,
+                                             G4UserLimits*           pUserLimits,
+                                             G4bool                  pOptimise,
+
+                                             G4ThreeVector           pNumberOfBlocks,
+                                             G4ThreeVector           pBetweenBlockSpacing,
+
+                                             G4ThreeVector           pScintillatorDimensions,
+                                             G4double                pScintillatorHousingThickness,
+										                         G4double				         pLightGuideLength,
+                                             G4MaterialPropertiesTable * pScintillatorHousingPT,
+
+                                             G4double                pPmtPhotocathodeRadius,
+                                             G4double                pPmtPhotocathodeHeight,
+                                             G4MaterialPropertiesTable * pLGHousingPT,
+                                             G4MaterialPropertiesTable * pPmtPT,
+                                             G4VSensitiveDetector*   pPmtSD,
+										                         G4VSensitiveDetector*   pScintSD)
+                    : G4LogicalVolume(pSolid,
                                       pMaterial,
                                       pName,
                                       pFieldManager,
@@ -41,11 +42,11 @@ MilliQDetectorStackLV::MilliQDetectorStackLV(G4VSolid*               pSolid,
     //
     // Detector Blocks
     //
-    
+
     // Detector Blocks - Volume
     G4Box* houseingV = new G4Box("Detector Block Housing Volume" ,
-                           1*m , 1*m , 1*m );//temp dimension
-    
+                                 1*m , 1*m , 1*m );//temp dimension
+
     // Detector Blocks - Logical Volume
     MilliQDetectorBlockLV* aDetectorBlock
     = new MilliQDetectorBlockLV(houseingV, //pSolid
@@ -58,21 +59,22 @@ MilliQDetectorStackLV::MilliQDetectorStackLV(G4VSolid*               pSolid,
 
                                 pScintillatorDimensions, //pScintillatorDimensions
                                 pScintillatorHousingThickness, //pScintillatorHousingThickness
-								pLightGuideLength,
-                                pScintillatorHousingReflectivity, //pScintillatorHousingReflectivity
+								                pLightGuideLength,
+                                pScintillatorHousingPT,
 
-								pPmtPhotocathodeRadius, //pPmtHeight
-								pPmtPhotocathodeHeight, //pPmtPhotocathodeDepth
-	                            pLGHousingReflectivity,//pLGHousingReflectivity
+								                pPmtPhotocathodeRadius, //pPmtHeight
+								                pPmtPhotocathodeHeight, //pPmtPhotocathodeDepth
+                                pLGHousingPT,
+                                pPmtPT,
                                 pPmtSD,
-								pScintSD);
-    
+								                pScintSD);
+
     // Detector Blocks - Parameterisation
     fDetectorBlockParameterisation
     = new MilliQDetectorBlockParameterisation(pNumberOfBlocks,                  //n
                                               aDetectorBlock->GetDimensions(),  //block dimensions
                                               pBetweenBlockSpacing);            //gap dimensions
-    
+
     // Detector Blocks - Physical Volume
     new G4PVParameterised( "Detector Block Housing Physical Volume",
                             aDetectorBlock,
@@ -101,7 +103,7 @@ void MilliQDetectorStackLV::AdjustVolume()
     //set final dimensions of stack housing and set this logical volume
     //
     fStackDimensions = fDetectorBlockParameterisation->GetStackDimensions();
-    
+
     G4Box* stackHouseingV = (G4Box*)this->GetSolid();
     stackHouseingV->SetXHalfLength(fStackDimensions.x()/2.);
     stackHouseingV->SetYHalfLength(fStackDimensions.y()/2.);

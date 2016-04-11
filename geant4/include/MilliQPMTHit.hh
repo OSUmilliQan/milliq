@@ -21,7 +21,7 @@ class G4AttValue;
 class MilliQPMTHit : public G4VHit
 {
   public:
- 
+
     MilliQPMTHit();
     MilliQPMTHit(G4int iCol,G4int iBlock);
     virtual ~MilliQPMTHit();
@@ -32,29 +32,29 @@ class MilliQPMTHit : public G4VHit
 
     inline void *operator new(size_t);
     inline void operator delete(void *aHit);
- 
+
     virtual void Draw();
     virtual const std::map<G4String,G4AttDef>* GetAttDefs() const;
     virtual std::vector<G4AttValue>* CreateAttValues() const;
     virtual void Print();
 
-    inline void SetDrawit(G4bool b){fDrawit=b;}
-    inline G4bool GetDrawit(){return fDrawit;}
+    inline void SetDrawit(G4bool b) { fDrawit = b; }
+    inline G4bool GetDrawit() { return fDrawit; }
 
-    inline void IncPhotonCount(){fPhotons++;}
-    inline G4int GetPhotonCount(){return fPhotons;}
+    inline void IncPhotonCount() { fPhotons++; }
+    inline G4int GetPhotonCount() { return fPhotons; }
 
     inline void SetPMTNumber(G4int n) { fPmtNumber = n; }
     inline G4int GetPMTNumber() { return fPmtNumber; }
 
-    inline void SetPMTPhysVol(G4VPhysicalVolume* physVol){this->fPhysVol=physVol;}
-    inline G4VPhysicalVolume* GetPMTPhysVol(){return fPhysVol;}
+    inline void SetPMTPhysVol(G4VPhysicalVolume* physVol) { this->fPhysVol = physVol; }
+    inline G4VPhysicalVolume* GetPMTPhysVol() { return fPhysVol; }
 
 //    inline void SetPMTPos(G4double x,G4double y,G4double z){
  //     fPos=G4ThreeVector(x,y,z);
 
 //    }
-     inline G4ThreeVector GetPMTPos(){return fPos;}
+     inline G4ThreeVector GetPMTPos() { return fPos; }
 
 
      //I added these:

@@ -45,6 +45,7 @@ public:
   void ReadConfiguration();
   void ReadGeometryConfiguration();
   void ReadScintillatorConfiguration();
+  void ReadScintillatorHousingConfiguration();
   void ReadPMTConfiguration();
 
   //Functions to modify the geometry
@@ -107,16 +108,25 @@ private:
   G4double fScintFastRiseTime;
   G4double fScintSlowTimeConstant;
   G4double fScintYieldRatio;
-
   G4double fScintBirksConstant;
+
+  G4double fScintHousingRefl;
+  G4double fScintHousingEff;
+
+  G4double fLGHousingRefl;
+  G4double fLGHousingEff;
 
   G4double fPmtRad;
   G4double fPmtPhotoRad;
   G4double fPmtPhotoHeight;
   G4double fPmtPhotoDepth;
-  G4double fLGHouseRefl;
+  //G4double fLGHouseRefl;
   G4double fOuterRadius_pmt;
   G4double fRefl;
+
+  G4double fPmtReR;
+  G4double fPmtImR;
+
   G4double NStacks;
   G4ThreeVector fOffset;
   G4ThreeVector shield1Thick;
@@ -133,11 +143,19 @@ private:
 
   G4Cache<MilliQMonopoleFieldSetup*> fEmFieldSetup;
 
-  std::vector<G4double> fEmissionEnergies;
-
   G4MaterialPropertyVector * fScintRelativeOutput;
   G4MaterialPropertyVector * fScintRIndex;
   G4MaterialPropertyVector * fScintAbsLength;
+
+  G4MaterialPropertyVector * fScintHousingReflectivity;
+  G4MaterialPropertyVector * fScintHousingEfficiency;
+
+  G4MaterialPropertyVector * fLGHousingReflectivity;
+  G4MaterialPropertyVector * fLGHousingEfficiency;
+
+  G4MaterialPropertyVector * fPmtEfficiency;
+  G4MaterialPropertyVector * fPmtRealRIndex;
+  G4MaterialPropertyVector * fPmtImaginaryRIndex;
 
   G4MaterialPropertyVector * fGlassRIndex;
   G4MaterialPropertyVector * fGlassAbsLength;
@@ -145,6 +163,10 @@ private:
   G4MaterialPropertyVector * fVacuumRIndex;
 
   G4MaterialPropertiesTable* fScintillator_mt;
+
+  G4MaterialPropertiesTable * fScintillatorHousingPT;
+  G4MaterialPropertiesTable * fLightGuideHousingPT;
+  G4MaterialPropertiesTable * fPhotoCathodePT;
 
   //Sensitive Detectors
   G4Cache<MilliQPMTSD*> fPmt_SD;

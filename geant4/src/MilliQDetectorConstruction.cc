@@ -83,6 +83,7 @@ void MilliQDetectorConstruction::ReadConfiguration() {
 
   ReadGeometryConfiguration();
   ReadScintillatorConfiguration();
+  ReadScintillatorHousingConfiguration();
   ReadPMTConfiguration();
 
 }
@@ -108,16 +109,13 @@ void MilliQDetectorConstruction::ReadGeometryConfiguration() {
   fScint_y = fGeometryPTree.get<G4double>("ScintillatorGeometry.Y") * cm;
   fScint_z = fGeometryPTree.get<G4double>("ScintillatorGeometry.Z") * cm;
 
-  fScintHouseThick = fGeometryPTree.get<G4double>("ScintillatorGeometry.HousingThickness") * cm;
-  fScintillatorHouseRefl = fGeometryPTree.get<G4double>("ScintillatorGeometry.HousingReflectivity");
-
 }
 
 void MilliQDetectorConstruction::ReadScintillatorConfiguration() {
 
   // energy of scintillating photons in eV
   // all other properties are functions of this vector
-  fEmissionEnergies = ptree_array<G4double>(fScintillatorPTree, "ScintillatorProperties.PhotonEmissionEnergies", eV);
+  std::vector<G4double> photonEnergies = ptree_array<G4double>(fScintillatorPTree, "ScintillatorProperties.PhotonEnergies", eV);
 
   // Scintillator properties
 
@@ -125,14 +123,11 @@ void MilliQDetectorConstruction::ReadScintillatorConfiguration() {
   fScintCarbonContent = fScintillatorPTree.get<G4int>("ScintillatorProperties.CarbonContent");
   fScintHydrogenContent = fScintillatorPTree.get<G4int>("ScintillatorProperties.HydrogenContent");
 
+  G4double scint_rIndex = fScintillatorPTree.get<G4double>("ScintillatorProperties.RIndex");
+  G4double scint_absLength = fScintillatorPTree.get<G4double>("ScintillatorProperties.AbsLength") * cm;
+
   // relative light output of scintillator (%)
   std::vector<G4double> v_scint_relativeOutput = ptree_array<G4double>(fScintillatorPTree, "ScintillatorProperties.FastScintOutput", 1.);
-
-  // refractive index
-  std::vector<G4double> v_scint_rIndex = ptree_array<G4double>(fScintillatorPTree, "ScintillatorProperties.RIndex", 1.);
-
-  // absolute length in cm
-  std::vector<G4double> v_scint_absLength = ptree_array<G4double>(fScintillatorPTree, "ScintillatorProperties.AbsLength", cm);
 
   fScintillationYield = fScintillatorPTree.get<G4double>("ScintillatorProperties.ScintillationYield") * 17400. / MeV;
   fScinitResolutionScale = fScintillatorPTree.get<G4double>("ScintillatorProperties.ResolutionScale");
@@ -140,14 +135,9 @@ void MilliQDetectorConstruction::ReadScintillatorConfiguration() {
   fScintFastRiseTime = fScintillatorPTree.get<G4double>("ScintillatorProperties.FastScintillationRiseTime") * ns;
   fScintSlowTimeConstant = fScintillatorPTree.get<G4double>("ScintillatorProperties.SlowTimeConstant") * ns;
   fScintYieldRatio = fScintillatorPTree.get<G4double>("ScintillatorProperties.YieldRatio");
-
   fScintBirksConstant = fScintillatorPTree.get<G4double>("ScintillatorProperties.BirksConstant") * mm / MeV;
 
-  const unsigned int numEnergies = fEmissionEnergies.size();
-
-  assert(v_scint_relativeOutput.size() == numEnergies &&
-         v_scint_rIndex.size() == numEnergies &&
-         v_scint_absLength.size() == numEnergies);
+  assert(v_scint_relativeOutput.size() == photonEnergies.size());
 
   // Now create G4MaterialPropertyVector objects from these
 
@@ -157,17 +147,47 @@ void MilliQDetectorConstruction::ReadScintillatorConfiguration() {
 
   fVacuumRIndex = new G4MaterialPropertyVector();
 
-  for(unsigned int i = 0; i < numEnergies; i++) {
-    fScintRelativeOutput->InsertValues(fEmissionEnergies[i], v_scint_relativeOutput[i]);
-    fScintRIndex->InsertValues(fEmissionEnergies[i], v_scint_rIndex[i]);
-    fScintAbsLength->InsertValues(fEmissionEnergies[i], v_scint_absLength[i]);
+  for(unsigned int i = 0; i < photonEnergies.size(); i++) {
+    fScintRelativeOutput->InsertValues(photonEnergies[i], v_scint_relativeOutput[i]);
+    fScintRIndex->InsertValues(photonEnergies[i], scint_rIndex);
+    fScintAbsLength->InsertValues(photonEnergies[i], scint_absLength);
 
-    fVacuumRIndex->InsertValues(fEmissionEnergies[i], 1.);
+    fVacuumRIndex->InsertValues(photonEnergies[i], 1.);
+  }
+
+}
+
+void MilliQDetectorConstruction::ReadScintillatorHousingConfiguration() {
+
+  std::vector<G4double> photonEnergies = ptree_array<G4double>(fScintillatorPTree, "HousingProperties.PhotonEnergies", eV);
+
+  // Housing properties
+  fScintHouseThick = fScintillatorPTree.get<G4double>("HousingProperties.Thickness") * cm;
+  fScintHousingRefl = fScintillatorPTree.get<G4double>("HousingProperties.Reflectivity");
+  fScintHousingEff = fScintillatorPTree.get<G4double>("HousingProperties.Efficiency");
+
+  // Light guide housing properties
+  fLGHousingRefl = fScintillatorPTree.get<G4double>("HousingProperties.ReflectivityLG");
+  fLGHousingEff = fScintillatorPTree.get<G4double>("HousingProperties.EfficiencyLG");
+
+  fScintHousingReflectivity = new G4MaterialPropertyVector();
+  fScintHousingEfficiency = new G4MaterialPropertyVector();
+  fLGHousingReflectivity = new G4MaterialPropertyVector();
+  fLGHousingEfficiency = new G4MaterialPropertyVector();
+
+  for(unsigned int i = 0; i < photonEnergies.size(); i++) {
+    fScintHousingReflectivity->InsertValues(photonEnergies[i], fScintHousingRefl);
+    fScintHousingEfficiency->InsertValues(photonEnergies[i], fScintHousingEff);
+
+    fLGHousingReflectivity->InsertValues(photonEnergies[i], fLGHousingRefl);
+    fLGHousingEfficiency->InsertValues(photonEnergies[i], fLGHousingEff);
   }
 
 }
 
 void MilliQDetectorConstruction::ReadPMTConfiguration() {
+
+  std::vector<G4double> photonEnergies = ptree_array<G4double>(fPMTPTree, "PMT.PhotonEnergies", eV);
 
   fBetweenBlockSpacing += G4ThreeVector(fPMTPTree.get<G4double>("PMT.Length") * cm,
                                         0. * cm,
@@ -177,27 +197,33 @@ void MilliQDetectorConstruction::ReadPMTConfiguration() {
   fPmtRad = fPMTPTree.get<G4double>("PMT.Radius") * cm;
   fPmtPhotoRad = fPMTPTree.get<G4double>("PMT.CathodeRadius") * cm;
   fPmtPhotoHeight = fPMTPTree.get<G4double>("PMT.CathodeHeight") * cm;
-  fLGHouseRefl = fPMTPTree.get<G4double>("PMT.HousingReflectivity");
+  //fLGHouseRefl = fPMTPTree.get<G4double>("PMT.HousingReflectivity");
+  fPmtReR = fPMTPTree.get<G4double>("PMT.ReR");
+  fPmtImR = fPMTPTree.get<G4double>("PMT.ImR");
+
+  std::vector<G4double> pmtEff = ptree_array<G4double>(fPMTPTree, "PMT.Efficiency", 1.);
+  assert(photonEnergies.size() == pmtEff.size());
+
+  fPmtEfficiency = new G4MaterialPropertyVector();
+  fPmtRealRIndex = new G4MaterialPropertyVector();
+  fPmtImaginaryRIndex = new G4MaterialPropertyVector();
+
+  for(unsigned int i = 0; i < photonEnergies.size(); i++) {
+    fPmtEfficiency->InsertValues(photonEnergies[i], pmtEff[i]);
+    fPmtRealRIndex->InsertValues(photonEnergies[i], fPmtReR);
+    fPmtImaginaryRIndex->InsertValues(photonEnergies[i], fPmtImR);
+  }
 
   // PMT glass properties
-
-  // refractive index
-  std::vector<G4double> v_glass_rIndex = ptree_array<G4double>(fPMTPTree, "PMTGlassProperties.RIndex", 1.);
-
-  // absolute length in cm
-  std::vector<G4double> v_glass_absLength = ptree_array<G4double>(fPMTPTree, "PMTGlassProperties.AbsLength", cm);
-
-  const unsigned int numEnergies = fEmissionEnergies.size();
-
-  assert(v_glass_rIndex.size() == numEnergies &&
-         v_glass_absLength.size() == numEnergies);
+  G4double glass_rIndex = fPMTPTree.get<G4double>("PMTGlassProperties.RIndex");
+  G4double glass_absLength = fPMTPTree.get<G4double>("PMTGlassProperties.AbsLength") * cm;
 
   fGlassRIndex = new G4MaterialPropertyVector();
   fGlassAbsLength = new G4MaterialPropertyVector();
 
-  for(unsigned int i = 0; i < numEnergies; i++) {
-    fGlassRIndex->InsertValues(fEmissionEnergies[i], v_glass_rIndex[i]);
-    fGlassAbsLength->InsertValues(fEmissionEnergies[i], v_glass_absLength[i]);
+  for(unsigned int i = 0; i < photonEnergies.size(); i++) {
+    fGlassRIndex->InsertValues(photonEnergies[i], glass_rIndex);
+    fGlassAbsLength->InsertValues(photonEnergies[i], glass_absLength);
   }
 
 }
@@ -311,6 +337,20 @@ void MilliQDetectorConstruction::DefineMaterials() {
   fVacuumMaterial->SetMaterialPropertiesTable(vacuum_mt);
 
   fAirMaterial->SetMaterialPropertiesTable(vacuum_mt); //Give air the same rindex
+
+  fScintillatorHousingPT = new G4MaterialPropertiesTable();
+  fScintillatorHousingPT->AddProperty("REFLECTIVITY", fScintHousingReflectivity);
+  fScintillatorHousingPT->AddProperty("EFFICIENCY", fScintHousingEfficiency);
+
+  fLightGuideHousingPT = new G4MaterialPropertiesTable();
+  fLightGuideHousingPT->AddProperty("REFLECTIVITYLG", fLGHousingReflectivity);
+  fLightGuideHousingPT->AddProperty("EFFICIENCYLG", fLGHousingEfficiency);
+
+  fPhotoCathodePT = new G4MaterialPropertiesTable();
+  fPhotoCathodePT->AddProperty("EFFICIENCY", fPmtEfficiency);
+  fPhotoCathodePT->AddProperty("REALRINDEX", fPmtRealRIndex);
+  fPhotoCathodePT->AddProperty("IMAGINARYRINDEX", fPmtImaginaryRIndex);
+
 }
 
 G4VPhysicalVolume* MilliQDetectorConstruction::Construct() {
@@ -417,11 +457,14 @@ G4VPhysicalVolume* MilliQDetectorConstruction::ConstructDetector() {
 								              G4ThreeVector(fScint_x, fScint_y, fScint_z), //scintillator dimensions
 								              fScintHouseThick, //scintillator housing thickness (and Glass Radius Height)
 								              fLightGuideLength, //light guide inside scintillator
-								              fScintillatorHouseRefl, //scintillator housing reflectivity
+                              fScintillatorHousingPT, // scintillator housing proprty table
 
 								              fPmtPhotoRad, //pmt Photocathode radius
 								              fPmtPhotoHeight, //pmt photocathode height
-								              fLGHouseRefl, //pmt housing reflective
+
+                              fLightGuideHousingPT, // light guide housing
+
+                              fPhotoCathodePT, // pmt photocathode property table
 								              pmt_SD, //pmt sensitive detector
 								              scint_SD); //scintillator sensitive detector
 

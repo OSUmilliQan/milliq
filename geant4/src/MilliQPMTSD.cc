@@ -117,35 +117,31 @@ G4bool MilliQPMTSD::ProcessHits_constStep(const G4Step* aStep,
 {
 
   //need to know if this is an optical photon
-  if(aStep->GetTrack()->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition()){
+  if(aStep->GetTrack()->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition()) {
     return false;
   }
 
-
   G4int pmtNumberBlock = aStep->GetPostStepPoint()->GetTouchable()->GetReplicaNumber(3);//GetReplicaNumber(1);
   G4int pmtNumberStack = aStep->GetPostStepPoint()->GetTouchable()->GetReplicaNumber(4);//GetReplicaNumber(1);
-  G4int pmtNumber = pmtNumberStack*NBlocks+pmtNumberBlock;
+  G4int pmtNumber = pmtNumberStack*NBlocks + pmtNumberBlock;
 
-  G4double hitTime = aStep -> GetPostStepPoint()->GetGlobalTime();
+  G4double hitTime = aStep->GetPostStepPoint()->GetGlobalTime();
 
-  G4VPhysicalVolume* physVol=
-    aStep->GetPostStepPoint()->GetTouchable()->GetVolume(3);
+  G4VPhysicalVolume* physVol = aStep->GetPostStepPoint()->GetTouchable()->GetVolume(3);
 
   //    G4cout<<"pmtNumberBlock "<<pmtNumberBlock<<" pmtNumberStack "<<pmtNumberStack<<" pmtNumber "<<pmtNumber<<G4endl;
 
-
   //Find the correct hit collection
-  G4int n=fPMTHitCollection->entries();
-  MilliQPMTHit* hit=NULL;
-  for(G4int i=0;i<n;i++){
-    if((*fPMTHitCollection)[i]->GetPMTNumber()==pmtNumber){
-      hit=(*fPMTHitCollection)[i];
+  G4int n = fPMTHitCollection->entries();
+  MilliQPMTHit* hit = NULL;
+  for(G4int i = 0; i < n; i++) {
+    if((*fPMTHitCollection)[i]->GetPMTNumber() == pmtNumber) {
+      hit = (*fPMTHitCollection)[i];
       break;
     }
   }
 
-
-  if(hit==NULL){//this pmt wasnt previously hit in this event
+  if(hit == NULL) { // this pmt wasnt previously hit in this event
     hit = new MilliQPMTHit(); //so create new hit
     hit->SetPMTNumber(pmtNumber);
     hit->SetPMTPhysVol(physVol);
@@ -156,20 +152,12 @@ G4bool MilliQPMTSD::ProcessHits_constStep(const G4Step* aStep,
 
   hit->SetDrawit(true);
 
-
-
   MilliQPMTHit* Allhit = new MilliQPMTHit();
   Allhit->SetPMTPhysVol(physVol);
   Allhit->SetPMTNumber(pmtNumber);
   Allhit->SetTime(hitTime);
 
-
   fPMTAllHitCollection->insert(Allhit);
-
-
-
-
-
 
   return true;
 }

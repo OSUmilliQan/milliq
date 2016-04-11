@@ -30,10 +30,10 @@ MilliQPMTHit::~MilliQPMTHit() {}
 
 MilliQPMTHit::MilliQPMTHit(const MilliQPMTHit &right) : G4VHit()
 {
-  fPmtNumber=right.fPmtNumber;
-  fPhotons=right.fPhotons;
-  fPhysVol=right.fPhysVol;
-  fDrawit=right.fDrawit;
+  fPmtNumber = right.fPmtNumber;
+  fPhotons = right.fPhotons;
+  fPhysVol = right.fPhysVol;
+  fDrawit = right.fDrawit;
   fStackID = right.fStackID;
   fBlockID = right.fBlockID;
   fEdep = right.fEdep;
@@ -42,12 +42,11 @@ MilliQPMTHit::MilliQPMTHit(const MilliQPMTHit &right) : G4VHit()
   fRot = right.fRot;
 }
 
-
 const MilliQPMTHit& MilliQPMTHit::operator=(const MilliQPMTHit &right){
   fPmtNumber = right.fPmtNumber;
-  fPhotons=right.fPhotons;
-  fPhysVol=right.fPhysVol;
-  fDrawit=right.fDrawit;
+  fPhotons = right.fPhotons;
+  fPhysVol = right.fPhysVol;
+  fDrawit = right.fDrawit;
   fStackID = right.fStackID;
   fBlockID = right.fBlockID;
   fEdep = right.fEdep;
@@ -58,8 +57,10 @@ const MilliQPMTHit& MilliQPMTHit::operator=(const MilliQPMTHit &right){
 }
 
 
-G4int MilliQPMTHit::operator==(const MilliQPMTHit &right) const{
-  return (fPmtNumber==right.fPmtNumber&&fStackID==right.fStackID&&fBlockID==right.fBlockID);
+G4int MilliQPMTHit::operator==(const MilliQPMTHit &right) const {
+  return (fPmtNumber == right.fPmtNumber &&
+          fStackID == right.fStackID &&
+          fBlockID == right.fBlockID);
 }
 
 

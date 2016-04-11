@@ -22,7 +22,7 @@ void MilliQDataFormat::CreateAnalysisManager() {
   // Default settings
   analysisManager->SetVerboseLevel(fVerboseLevel);
   analysisManager->SetFileName("MilliQ");
-  
+
 }
 
 void MilliQDataFormat::CreateHistograms() {
@@ -37,6 +37,10 @@ void MilliQDataFormat::CreateHistograms() {
 }
 
 void MilliQDataFormat::CreateNtuples() {
+
+  // kRawData
+  //durp
+
 
   // kScintHits
   analysisManager->CreateNtuple("MilliQEn", "ScintHits");
