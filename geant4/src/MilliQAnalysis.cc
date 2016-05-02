@@ -90,7 +90,7 @@ void MilliQAnalysis::NearestN() {
     }
   }
 
-  // The next part sets all puts zeroes three times per event for pmtTimes, timeOfFlight, and activeEvent???
+  // The next part sets all zeroes three times per event for pmtTimes, timeOfFlight, and activeEvent???
 
   if(recordEvent) {
     if(fVerbose) G4cout << "Recorded Event" << G4endl;
