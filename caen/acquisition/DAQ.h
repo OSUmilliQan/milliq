@@ -28,7 +28,7 @@ struct EventNode {
 
 	//uint8_t  GrPresent[nSamBlocks];       // if the group has data the value is 1 (else 0)
 
-	//uint32_t ChSize[nSamBlocks];          // number of samples stored in DataChannel array
+	uint32_t ChSize[nSamBlocks];          // number of samples stored in DataChannel array
 	float** Waveform;
 	uint16_t TriggerCount[nSamBlocks][nChannelsPerSamBlock];
 	uint16_t TimeCount[nSamBlocks][nChannelsPerSamBlock];
@@ -63,6 +63,7 @@ public:
 	void SetTriggerThreshold(double TriggerThreshold, int channel);
 	void SetTriggerPolarity(CAEN_DGTZ_TriggerPolarity_t TriggerPolarity, int channel);
 	void SetTriggerSource(RunConfiguration cfg);
+	void SetIOLevel(CAEN_DGTZ_IOLevel_t level);
 	void SetChannelDCOffset(double DCOffset, int channel);
 	void SetCorrectionLevel(CAEN_DGTZ_SAM_CORRECTION_LEVEL_t level);
 	void SetMaxNumEventsBLT(int MaxNumEventsBLT);

@@ -32,15 +32,15 @@
     <!-- samFrequency rate: 3.2, 1.6, 0.8, 0.4 GS/s -->
     <samFrequency rate="3.2" />
 
-    <!-- recordLength in samples -->
-    <recordLength length="1024" />
+    <!-- recordLength in samples: N*16, N>=4-->
+    <recordLength length="512" />
 
     <!-- triggerDelay in samples -->
-    <triggerDelay delay="44" />
+    <triggerDelay delay="36" />
 
     <!-- triggerType: software, normal, auto, external -->
-    <triggerType type="normal" />
-
+    <triggerType type="external" />
+    
     <!-- ioLevel: NIM, TTL -->
     <ioLevel type="TTL" />
 
@@ -110,11 +110,11 @@
       testPulsePattern="01"
       testPulseSource="continuous"
       triggerEnable="1"
-      triggerThreshold="0.180"
-      triggerPolarity="risingEdge"
+      triggerThreshold="-0.002"
+      triggerPolarity="fallingEdge"
       dcOffset="0.000"
-      chargeStartCell="1"
-      chargeLength="57"
+      chargeStartCell="81"
+      chargeLength="225"
       enableChargeThreshold="0"
       chargeThreshold="0.0"
       />

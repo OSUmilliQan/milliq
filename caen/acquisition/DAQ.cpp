@@ -20,7 +20,7 @@ EventNode * CopyEvent(CAEN_DGTZ_X743_EVENT_t * evt) {
 
 		//node->GrPresent[samIndex] = evt->GrPresent[samIndex];
 
-		//node->ChSize[samIndex] = evt->DataGroup[samIndex].ChSize;
+		node->ChSize[samIndex] = evt->DataGroup[samIndex].ChSize;
 
 		for (int i = 0; i < nChannelsPerSamBlock; i++) {
 			node->TriggerCount[samIndex][i] = evt->DataGroup[samIndex].TriggerCount[i];
@@ -121,29 +121,26 @@ void DAQ::ConnectToBoard(RunConfiguration cfg) {
 	printf("License:                 %s\n", info.License);
 	printf("\n\n");
 
+	CAEN_DGTZ_Reset(DeviceHandle);
+
 }
 
 void DAQ::InitializeBoardParameters(RunConfiguration cfg) {
 
-	/*
-	CAEN_DGTZ_AnalogMonitorOutputMode_t mode;
-	CAEN_DGTZ_GetAnalogMonOutput(DeviceHandle, &mode);
-	if (mode == CAEN_DGTZ_AM_ANALOG_INSPECTION) printf("000");
-	if (mode == CAEN_DGTZ_AM_BUFFER_OCCUPANCY) printf("001");
-	if (mode == CAEN_DGTZ_AM_TEST) printf("002");
-	if (mode == CAEN_DGTZ_AM_TRIGGER_MAJORITY) printf("003");
-	if (mode == CAEN_DGTZ_AM_VOLTAGE_LEVEL) printf("004");
-	printf("Mode = %d\n", (int)mode);
+	uint32_t modeSelection = 0;
+	modeSelection |= 1 << 0;
+	modeSelection |= 1 << 1;
+	int status_wr = CAEN_DGTZ_WriteRegister(DeviceHandle, 0x8144, modeSelection);
+	printf("Write Register Status: %d\n", status_wr);
 
-	printf("durp: %d\n", CAEN_DGTZ_SetAnalogInspectionMonParams(DeviceHandle, 0xFF, 0, CAEN_DGTZ_AM_MAGNIFY_1X, CAEN_DGTZ_AM_INSPECTORINVERTER_P_1X));
-	printf("durp: %d\n", CAEN_DGTZ_SetAnalogMonOutput(DeviceHandle, CAEN_DGTZ_AM_TEST));
-	*/
+	status_wr = CAEN_DGTZ_WriteRegister(DeviceHandle, 0x81B4, 4);
+	printf("Write Register 0x81B4 status: %d\n", status_wr);
 
 	useChargeMode = cfg.useChargeMode;
 	useIRQ = cfg.useIRQ;
 
-	SetTriggerDelay(cfg.TriggerDelay);
 	SetRecordLength(cfg.RecordLength);
+	SetTriggerDelay(cfg.TriggerDelay);
 	SetSamplingFrequency(cfg.SAMFrequency);
 
 	SetPulserParameters(cfg.channels);
@@ -151,6 +148,7 @@ void DAQ::InitializeBoardParameters(RunConfiguration cfg) {
 	for(int i = 0; i < nChannels; i++) SetTriggerThreshold(cfg.channels[i].triggerThreshold, i);
 
 	SetTriggerSource(cfg);
+	SetIOLevel(cfg.IOLevel);
 
 	for(int i = 0; i < nChannels; i++) SetTriggerPolarity(cfg.channels[i].triggerPolarity, i);
 
@@ -299,7 +297,9 @@ int DAQ::DecodeEvent(int eventNumber) {
 																										 &eventPtr);
 
 	if (error == CAEN_DGTZ_Success) {
+		//printf("Going to DecodeEvent(%d...", eventNumber);
 		error = CAEN_DGTZ_DecodeEvent(DeviceHandle, eventPtr, (void**)&CurrentEvent);
+		//printf("done\n");
 		if (error < 0) {
 			cout << "Error Code in function CAEN_DGTZ_DecodeEvent: " << error << endl;
 			result = -1;
@@ -458,6 +458,10 @@ void DAQ::SetTriggerSource(RunConfiguration cfg) {
 		CAEN_DGTZ_SetExtTriggerInputMode(DeviceHandle, CAEN_DGTZ_TRGMODE_ACQ_ONLY);
 	}
 
+}
+
+void DAQ::SetIOLevel(CAEN_DGTZ_IOLevel_t level) {
+	CAEN_DGTZ_SetIOLevel(DeviceHandle, level);
 }
 
 void DAQ::SetChannelDCOffset(double DCOffset, int channel) {

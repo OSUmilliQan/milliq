@@ -12,6 +12,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TString.h"
+#include "TGraph.h"
 
 using namespace std;
 
@@ -40,7 +41,7 @@ void * acquisitionLoop(void*) {
 	int statusCode = -1;
 
 	RunConfiguration cfg;
-	statusCode = cfg.ParseConfigFile("default.xml");
+	statusCode = cfg.ParseConfigFile("pmt.xml");
 	recordLength = cfg.RecordLength;
 
 	if(statusCode != 0 || !cfg.CheckAllParametersSet()) {
@@ -205,6 +206,21 @@ void * eventProcessLoop(void*) {
 					_TimeCount = localHead->TimeCount[samIndex][chanIndex];
 					_EventId = localHead->EventId[samIndex];
 					_TDC = localHead->TDC[samIndex];
+
+					/*
+					if (i == 1) {
+						float gr_x[1024];
+						for (unsigned int j = 0; j < 1024; j++) gr_x[j] = (float)j;
+						float gr_y[1024];
+						for (unsigned int j = 0; j < 1024; j++) {
+							if (j >= localHead->ChSize[i / 2]) gr_y[j] = -10000;
+							else gr_y[j] = localHead->Waveform[i][j];
+						}
+						TGraph * gr = new TGraph(1024, gr_x, gr_y);
+						TString gr_name = Form("%d", recordedEvents);
+						gr->Write("gr_channel1_ev" + gr_name);
+					}
+					*/
 
 					float _max = -1.e6;
 					float _min = 1.e6;

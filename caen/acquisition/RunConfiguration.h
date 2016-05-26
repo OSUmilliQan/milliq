@@ -107,6 +107,8 @@ class RunConfiguration {
 
     TriggerType_t TriggerType;
 
+	CAEN_DGTZ_IOLevel_t IOLevel;
+
     uint32_t MaxNumEventsBLT;
 
     CAEN_DGTZ_TrigerLogic_t GroupTriggerLogic;
@@ -118,7 +120,7 @@ class RunConfiguration {
   private:
     const int numChannels = 16;
     const int numGroups = 8;
-    const int numExpectedCommonParameters = 10;
+    const int numExpectedCommonParameters = 11;
 
     int numCommonParametersRead;
 };

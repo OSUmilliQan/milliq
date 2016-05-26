@@ -133,6 +133,18 @@ int RunConfiguration::ParseConfigFile(string filename) {
 			numCommonParametersRead++;
 		}
 
+		if (name == "ioLevel") {
+			str_ = sub_pt.get<string>("<xmlattr>.type");
+			if (str_ == "TTL") IOLevel = CAEN_DGTZ_IOLevel_TTL;
+			else if (str_ == "NIM") IOLevel = CAEN_DGTZ_IOLevel_NIM;
+			else {
+				cout << "Invalid IO level!" << endl;
+				return -1;
+			}
+
+			numCommonParametersRead++;
+		}
+
 		if (name == "maxNumEventsBLT") {
 			MaxNumEventsBLT = sub_pt.get<uint32_t>("<xmlattr>.number");
 			numCommonParametersRead++;
